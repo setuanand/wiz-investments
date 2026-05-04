@@ -29,6 +29,17 @@ body { margin: 0; line-height: 1.6; }
 .site-nav .menu li a { color: #111; text-decoration: none; font-weight: 600; }
 .site-nav .menu li a:hover { color: #0b6; }
 
+/* Auth Navigation */
+.auth-nav { display: flex; gap: 12px; align-items: center; }
+.user-menu, .guest-menu { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.user-name { font-weight: 600; color: #111; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.3s; font-size: 0.95rem; }
+.btn-sm { padding: 8px 12px; font-size: 0.9rem; }
+.btn-primary { background: #0b6; color: white; }
+.btn-primary:hover { background: #0a5; }
+.btn-secondary { background: #e5e7eb; color: #111; }
+.btn-secondary:hover { background: #d1d5db; }
+
 .hero { background: linear-gradient(135deg, #0b6, #4a90e2); color: white; border-radius: 24px; padding: 80px 24px; margin: 0 -24px 36px; text-align: center; }
 .hero-content { max-width: 760px; margin: 0 auto; }
 .hero h1 { font-size: clamp(2.2rem, 4vw, 3.6rem); margin-bottom: 1rem; line-height: 1.05; }
