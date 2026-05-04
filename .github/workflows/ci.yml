@@ -8,10 +8,12 @@ jobs:
   lint-theme:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Set up PHP
         uses: shivammathur/setup-php@v4
         with:
-          php-version: 8.3
+          php-version: '8.3'
+      - name: Verify PHP installation
+        run: php -v
       - name: Run theme validation tests
         run: bash scripts/test.sh
