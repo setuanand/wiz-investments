@@ -1,0 +1,36 @@
+# Ignore WordPress core files and generated content
+wp-admin/
+wp-includes/
+index.php
+license.txt
+readme.html
+xmlrpc.php
+wp-config.php
+wp-config-sample.php
+.htaccess
+
+# Ignore uploads and caches
+wp-content/upgrade/
+wp-content/backups/
+wp-content/cache/
+wp-content/uploads/
+
+# Track only the custom theme contents
+wp-content/plugins/*
+!wp-content/themes/
+wp-content/themes/*
+!wp-content/themes/wiz-theme/
+wp-content/themes/wiz-theme/**
+
+# Local environment files
+.env
+docker-compose.override.yml
+
+# Editor and system files
+.DS_Store
+.idea/
+.vscode/
+
+generated/
+node_modules/
+vendor/

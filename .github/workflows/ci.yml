@@ -1,0 +1,18 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-theme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: 8.3
+      - name: Validate PHP syntax
+        run: |
+          find wp-content/themes/wiz-theme -name '*.php' -print0 | xargs -0 php -l
