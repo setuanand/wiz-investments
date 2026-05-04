@@ -24,6 +24,14 @@ Then open:
 http://localhost:8000
 ```
 
+## Testing
+
+Run the automated theme validation locally (requires PHP CLI installed):
+
+```bash
+bash scripts/test.sh
+```
+
 Complete the WordPress installer and log in to WP Admin.
 
 ## Theme Activation

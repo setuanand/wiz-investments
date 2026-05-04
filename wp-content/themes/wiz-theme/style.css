@@ -1,0 +1,83 @@
+/*
+Theme Name: Wiz Theme
+Theme URI: https://github.com/setuanand/wiz-investments
+Author: Wiz Investments
+Author URI: https://github.com/setuanand
+Description: A custom WordPress theme for Wiz Investments with analytics, contact form, and a polished responsive layout.
+Version: 0.2
+License: MIT
+Text Domain: wiz-theme
+*/
+
+:root {
+  color-scheme: light;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111;
+  background: #f7f9fb;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; line-height: 1.6; }
+
+.site { max-width: 1180px; margin: 0 auto; padding: 0 24px 48px; }
+.site-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; padding: 24px 0; }
+.site-branding { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.site-title { margin: 0; font-size: 1.6rem; font-weight: 800; color: #111; text-decoration: none; }
+.site-description { margin: 0; color: #4b5563; font-size: 0.95rem; }
+.site-nav .menu { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 16px; }
+.site-nav .menu li a { color: #111; text-decoration: none; font-weight: 600; }
+.site-nav .menu li a:hover { color: #0b6; }
+
+.hero { background: linear-gradient(135deg, #0b6, #4a90e2); color: white; border-radius: 24px; padding: 80px 24px; margin: 0 -24px 36px; text-align: center; }
+.hero-content { max-width: 760px; margin: 0 auto; }
+.hero h1 { font-size: clamp(2.2rem, 4vw, 3.6rem); margin-bottom: 1rem; line-height: 1.05; }
+.hero p { font-size: 1.05rem; margin-bottom: 1.5rem; max-width: 640px; margin-left: auto; margin-right: auto; }
+.cta-button { display: inline-flex; align-items:center; justify-content:center; gap:8px; background: #fff; color: #0b6; border-radius: 999px; padding: 14px 26px; font-weight: 700; text-decoration: none; }
+
+.analytics-card, .service-card, .page-content, .content-card { background: #fff; border-radius: 20px; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08); }
+
+.services-preview, .analytics-preview { padding: 52px 0; }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto; }
+.service-card { padding: 24px; min-height: 220px; }
+.service-card h3 { margin-top: 0; }
+
+.page-content { margin: 40px auto; padding: 40px; }
+.page-content h1, .page-content h2, .page-content h3 { margin-top: 0; }
+.page-content p { color: #4b5563; }
+.services-list .service-detail { margin-bottom: 32px; }
+
+.contact-form { display: grid; gap: 16px; max-width: 520px; margin: 0 auto 40px; }
+.contact-form label { font-weight: 700; }
+.contact-form input, .contact-form textarea { width: 100%; padding: 14px 16px; border: 1px solid #d1d5db; border-radius: 12px; background: #fff; }
+.contact-form button { background: #0b6; color: white; padding: 14px 22px; border: none; border-radius: 999px; cursor: pointer; font-size: 1rem; font-weight: 700; }
+.contact-form button:hover { background: #0a5; }
+.form-notice { margin-bottom: 20px; padding: 18px 22px; border-radius: 14px; font-weight: 600; }
+.form-notice.success { background: #e9faf0; color: #0f5132; border: 1px solid #8dd3b3; }
+.form-notice.error { background: #fcedf1; color: #8a1919; border: 1px solid #f5c2c2; }
+.contact-info { text-align: center; color: #4b5563; }
+
+#analytics-root { display: grid; gap: 20px; }
+#analytics-root #controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; align-items: center; }
+#analytics-root label { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 0.95rem; color: #1f2937; }
+#analytics-root select, #analytics-root input { min-width: 120px; }
+#analytics-root .results-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; align-items: start; }
+#analytics-root #analytics-results { min-height: 120px; }
+#equityChart { width: 100%; height: 320px; }
+.trade-table { width: 100%; border-collapse: collapse; }
+.trade-table th, .trade-table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+#analytics-root .analytics-card { padding: 20px; }
+
+footer.site-footer { padding: 24px 0; text-align: center; color: #6b7280; font-size: 0.95rem; }
+
+@media (max-width: 900px) {
+  .site { padding: 0 18px 30px; }
+  .site-header { flex-direction: column; align-items: flex-start; }
+  .services-grid, #analytics-root .results-grid { grid-template-columns: 1fr; }
+  .hero { margin: 0 -24px 36px; padding: 60px 18px; }
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 2.2rem; }
+  .site-nav .menu { gap: 10px; }
+}

@@ -17,10 +17,9 @@ wp-content/uploads/
 
 # Track only the custom theme contents
 wp-content/plugins/*
-!wp-content/themes/
 wp-content/themes/*
 !wp-content/themes/wiz-theme/
-wp-content/themes/wiz-theme/**
+!wp-content/themes/wiz-theme/**
 
 # Local environment files
 .env
