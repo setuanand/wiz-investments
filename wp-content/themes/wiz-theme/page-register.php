@@ -33,7 +33,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'verify_email' && isset($_GET[
 
     if ($verify_result['success']) {
         $is_success = true;
-        $registration_message = $verify_result['message'] . ' <a href="' . esc_url(get_home_url(null, 'login')) . '">Login here</a>.';
+        $registration_message = $verify_result['message'] . ' <a href="' . esc_url(wiz_get_page_url_by_slug('login')) . '">Login here</a>.';
     } else {
         $registration_message = $verify_result['message'];
     }
@@ -99,7 +99,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'verify_email' && isset($_GET[
         </form>
 
         <div class="auth-footer">
-            Already have an account? <a href="<?php echo esc_url(get_home_url(null, 'login')); ?>">Login here</a>
+            Already have an account? <a href="<?php echo esc_url(wiz_get_page_url_by_slug('login')); ?>">Login here</a>
         </div>
         <?php endif; ?>
     </div>

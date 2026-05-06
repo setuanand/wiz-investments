@@ -31,11 +31,46 @@ function wiz_register_widget_areas() {
 add_action('widgets_init', 'wiz_register_widget_areas');
 
 function wiz_theme_menu_fallback() {
+    $exclude_pages = array(
+        wiz_get_page_id_by_slug('login'),
+        wiz_get_page_id_by_slug('register'),
+        wiz_get_page_id_by_slug('forgot-password'),
+        wiz_get_page_id_by_slug('reset-password'),
+        wiz_get_page_id_by_slug('dashboard'),
+    );
+
+    $exclude_pages = array_filter($exclude_pages);
+
     wp_page_menu(array(
         'menu_class' => 'menu',
         'show_home' => true,
+        'exclude' => implode(',', $exclude_pages),
     ));
 }
+
+function wiz_exclude_auth_pages_from_primary_menu($items, $args) {
+    if ('primary' !== $args->theme_location) {
+        return $items;
+    }
+
+    $exclude_keys = array('login', 'register', 'forgot-password', 'reset-password', 'dashboard');
+
+    return array_filter($items, function($item) use ($exclude_keys) {
+        $url = strtolower(trim($item->url));
+        foreach ($exclude_keys as $key) {
+            if (strpos($url, '/' . $key) !== false) {
+                return false;
+            }
+
+            if (strtolower(sanitize_title($item->title)) === $key) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+add_filter('wp_nav_menu_objects', 'wiz_exclude_auth_pages_from_primary_menu', 10, 2);
 
 function wiz_register_contact_submission_cpt() {
     register_post_type('contact_submission', array(
@@ -93,53 +128,59 @@ function wiz_get_page_id_by_slug($slug) {
     return $page ? $page->ID : 0;
 }
 
+function wiz_get_page_url_by_slug($slug) {
+    $page_id = wiz_get_page_id_by_slug($slug);
+    if ($page_id) {
+        return get_permalink($page_id);
+    }
+    return home_url('/' . trim($slug, '/'));
+}
+
 function wiz_create_default_pages() {
-    if (current_user_can('manage_options')) {
-        $pages = array(
-            array('title' => 'About', 'slug' => 'about', 'template' => 'page-about.php'),
-            array('title' => 'Services', 'slug' => 'services', 'template' => 'page-services.php'),
-            array('title' => 'Contact', 'slug' => 'contact', 'template' => 'page-contact.php'),
-            array('title' => 'Analytics Dashboard', 'slug' => 'analytics-dashboard', 'template' => 'page-analytics.php'),
-        );
+    $pages = array(
+        array('title' => 'About', 'slug' => 'about', 'template' => 'page-about.php'),
+        array('title' => 'Services', 'slug' => 'services', 'template' => 'page-services.php'),
+        array('title' => 'Contact', 'slug' => 'contact', 'template' => 'page-contact.php'),
+        array('title' => 'Analytics Dashboard', 'slug' => 'analytics-dashboard', 'template' => 'page-analytics.php'),
+    );
 
-        foreach ($pages as $page_data) {
-            if (!wiz_get_page_id_by_slug($page_data['slug'])) {
-                $page_id = wp_insert_post(array(
-                    'post_title' => $page_data['title'],
-                    'post_name' => $page_data['slug'],
-                    'post_status' => 'publish',
-                    'post_type' => 'page',
-                    'post_content' => '',
-                ));
+    foreach ($pages as $page_data) {
+        if (!wiz_get_page_id_by_slug($page_data['slug'])) {
+            $page_id = wp_insert_post(array(
+                'post_title' => $page_data['title'],
+                'post_name' => $page_data['slug'],
+                'post_status' => 'publish',
+                'post_type' => 'page',
+                'post_content' => '',
+            ));
 
-                if (!is_wp_error($page_id) && $page_data['template']) {
-                    update_post_meta($page_id, '_wp_page_template', $page_data['template']);
-                }
+            if (!is_wp_error($page_id) && $page_data['template']) {
+                update_post_meta($page_id, '_wp_page_template', $page_data['template']);
             }
         }
+    }
 
-        // Create authentication pages
-        $auth_pages = array(
-            array('title' => 'Register', 'slug' => 'register', 'template' => 'page-register.php'),
-            array('title' => 'Login', 'slug' => 'login', 'template' => 'page-login.php'),
-            array('title' => 'Dashboard', 'slug' => 'dashboard', 'template' => 'page-dashboard.php'),
-            array('title' => 'Forgot Password', 'slug' => 'forgot-password', 'template' => 'page-forgot-password.php'),
-            array('title' => 'Reset Password', 'slug' => 'reset-password', 'template' => 'page-reset-password.php'),
-        );
+    // Create authentication pages
+    $auth_pages = array(
+        array('title' => 'Register', 'slug' => 'register', 'template' => 'page-register.php'),
+        array('title' => 'Login', 'slug' => 'login', 'template' => 'page-login.php'),
+        array('title' => 'Dashboard', 'slug' => 'dashboard', 'template' => 'page-dashboard.php'),
+        array('title' => 'Forgot Password', 'slug' => 'forgot-password', 'template' => 'page-forgot-password.php'),
+        array('title' => 'Reset Password', 'slug' => 'reset-password', 'template' => 'page-reset-password.php'),
+    );
 
-        foreach ($auth_pages as $page_data) {
-            if (!wiz_get_page_id_by_slug($page_data['slug'])) {
-                $page_id = wp_insert_post(array(
-                    'post_title' => $page_data['title'],
-                    'post_name' => $page_data['slug'],
-                    'post_status' => 'publish',
-                    'post_type' => 'page',
-                    'post_content' => '',
-                ));
+    foreach ($auth_pages as $page_data) {
+        if (!wiz_get_page_id_by_slug($page_data['slug'])) {
+            $page_id = wp_insert_post(array(
+                'post_title' => $page_data['title'],
+                'post_name' => $page_data['slug'],
+                'post_status' => 'publish',
+                'post_type' => 'page',
+                'post_content' => '',
+            ));
 
-                if (!is_wp_error($page_id) && $page_data['template']) {
-                    update_post_meta($page_id, '_wp_page_template', $page_data['template']);
-                }
+            if (!is_wp_error($page_id) && $page_data['template']) {
+                update_post_meta($page_id, '_wp_page_template', $page_data['template']);
             }
         }
     }
@@ -158,7 +199,7 @@ function wiz_send_verification_email($user_id, $email, $token) {
     $verify_link = add_query_arg(array(
         'action' => 'verify_email',
         'token' => $token,
-    ), get_home_url(null, 'register'));
+    ), wiz_get_page_url_by_slug('register'));
 
     $subject = 'Verify your Wiz Investments email address';
     $message = sprintf(
@@ -177,7 +218,7 @@ function wiz_send_verification_email($user_id, $email, $token) {
 function wiz_send_password_reset_email($email, $token) {
     $reset_link = add_query_arg(array(
         'token' => $token,
-    ), get_home_url(null, 'reset-password'));
+    ), wiz_get_page_url_by_slug('reset-password'));
 
     $subject = 'Reset your Wiz Investments password';
     $message = sprintf(
@@ -358,7 +399,7 @@ function wiz_enqueue_auth_scripts() {
     if (is_page_template('page-login.php') || is_page_template('page-register.php') || 
         is_page_template('page-dashboard.php') || is_page_template('page-forgot-password.php') ||
         is_page_template('page-reset-password.php')) {
-        wp_enqueue_style('wiz-auth', get_template_directory_uri() . '/assets/css/auth.css');
+        wp_enqueue_style('wiz-auth', get_template_directory_uri() . '/assets/css/auth.css', array(), filemtime(get_stylesheet_directory() . '/assets/css/auth.css'));
         wp_enqueue_script('wiz-auth', get_template_directory_uri() . '/assets/js/auth.js', array(), '1.0', true);
     }
 }

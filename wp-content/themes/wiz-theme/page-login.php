@@ -10,7 +10,7 @@ $message_type = '';
 
 // Redirect if already logged in
 if (is_user_logged_in()) {
-    wp_redirect(home_url('/dashboard'));
+    wp_redirect(wiz_get_page_url_by_slug('dashboard'));
     exit;
 }
 
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wiz_login_submit'])) 
                 wp_set_auth_cookie($user->ID);
                 do_action('wp_login', $user->user_login, $user);
 
-                wp_redirect(home_url('/dashboard'));
+                wp_redirect(wiz_get_page_url_by_slug('dashboard'));
                 exit;
             }
         }
@@ -97,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wiz_login_submit'])) 
         </form>
 
         <div class="auth-footer">
-            Don't have an account? <a href="<?php echo esc_url(get_home_url(null, 'register')); ?>">Register here</a><br>
-            <a href="<?php echo esc_url(get_home_url(null, 'forgot-password')); ?>">Forgot your password?</a>
+            Don't have an account? <a href="<?php echo esc_url(wiz_get_page_url_by_slug('register')); ?>">Register here</a><br>
+            <a href="<?php echo esc_url(wiz_get_page_url_by_slug('forgot-password')); ?>">Forgot your password?</a>
         </div>
     </div>
 </div>

@@ -7,8 +7,7 @@ get_header();
 
 // Redirect if not logged in
 if (!is_user_logged_in()) {
-    wp_redirect(home_url('/login'));
-    exit;
+        wp_redirect(wiz_get_page_url_by_slug('login'));
 }
 
 $user = wp_get_current_user();

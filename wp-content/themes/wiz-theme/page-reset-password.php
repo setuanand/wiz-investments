@@ -90,7 +90,7 @@ if (!isset($_GET['token'])) {
         </form>
         <?php elseif ($message_type === 'success'): ?>
             <div class="auth-footer">
-                <a href="<?php echo esc_url(get_home_url(null, 'login')); ?>" class="btn btn-primary btn-block">
+                <a href="<?php echo esc_url(wiz_get_page_url_by_slug('login')); ?>" class="btn btn-primary btn-block">
                     Go to Login
                 </a>
             </div>
@@ -98,7 +98,7 @@ if (!isset($_GET['token'])) {
 
         <?php if (!$token_valid && $message_type !== 'success'): ?>
         <div class="auth-footer">
-            <a href="<?php echo esc_url(get_home_url(null, 'forgot-password')); ?>">Request another reset link</a>
+            <a href="<?php echo esc_url(wiz_get_page_url_by_slug('forgot-password')); ?>">Request another reset link</a>
         </div>
         <?php endif; ?>
     </div>

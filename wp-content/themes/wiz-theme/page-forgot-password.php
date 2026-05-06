@@ -59,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wiz_forgot_submit']))
         </form>
 
         <div class="auth-footer">
-            Remember your password? <a href="<?php echo esc_url(get_home_url(null, 'login')); ?>">Login here</a><br>
-            Don't have an account? <a href="<?php echo esc_url(get_home_url(null, 'register')); ?>">Register here</a>
+            Remember your password? <a href="<?php echo esc_url(wiz_get_page_url_by_slug('login')); ?>">Login here</a><br>
+            Don't have an account? <a href="<?php echo esc_url(wiz_get_page_url_by_slug('register')); ?>">Register here</a>
         </div>
     </div>
 </div>
