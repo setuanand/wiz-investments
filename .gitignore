@@ -32,4 +32,4 @@ docker-compose.override.yml
 
 generated/
 node_modules/
-vendor/
+vendor/*.sql
