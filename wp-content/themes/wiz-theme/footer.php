@@ -27,6 +27,7 @@
         <ul>
           <?php if ( is_user_logged_in() ) : ?>
             <li><a href="<?php echo esc_url( wiz_get_page_url_by_slug('dashboard') ); ?>">Dashboard</a></li>
+            <li><a href="<?php echo esc_url( wiz_get_page_url_by_slug('edit-profile') ); ?>">Edit Profile</a></li>
             <li><a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>">Logout</a></li>
           <?php else : ?>
             <li><a href="<?php echo esc_url( wiz_get_page_url_by_slug('login') ); ?>">Log In</a></li>
@@ -39,9 +40,9 @@
       <div class="footer-col">
         <h4>Legal</h4>
         <ul>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Disclaimer</a></li>
+          <li><a href="<?php echo esc_url( wiz_get_page_url_by_slug('privacy-policy') ); ?>">Privacy Policy</a></li>
+          <li><a href="<?php echo esc_url( wiz_get_page_url_by_slug('terms-of-service') ); ?>">Terms of Service</a></li>
+          <li><a href="<?php echo esc_url( wiz_get_page_url_by_slug('contact') ); ?>">Disclaimer</a></li>
         </ul>
         <div style="margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.5;">
           Market data provided by<br>
