@@ -261,3 +261,31 @@ function wiz_enqueue_auth_scripts() {
     }
 }
 add_action('wp_enqueue_scripts', 'wiz_enqueue_auth_scripts');
+
+// Contact form AJAX handler
+function wiz_ajax_contact() {
+    if (!isset($_POST['wiz_contact_nonce']) || !wp_verify_nonce($_POST['wiz_contact_nonce'], 'wiz_contact_action')) {
+        wp_send_json_error('Security check failed. Please refresh and try again.');
+    }
+    $name    = sanitize_text_field($_POST['name'] ?? '');
+    $email   = sanitize_email($_POST['email'] ?? '');
+    $message = sanitize_textarea_field($_POST['message'] ?? '');
+    if (empty($name) || empty($email) || empty($message)) {
+        wp_send_json_error('Please complete all fields before submitting.');
+    }
+    $post_id = wp_insert_post(array(
+        'post_title'   => 'Contact from ' . $name,
+        'post_type'    => 'contact_submission',
+        'post_content' => $message,
+        'post_status'  => 'private',
+    ));
+    if (is_wp_error($post_id)) {
+        wp_send_json_error('Unable to save your message. Please try again.');
+    }
+    update_post_meta($post_id, 'contact_email', $email);
+    update_post_meta($post_id, 'contact_name', $name);
+    wp_mail(get_option('admin_email'), 'New Contact Message from ' . $name, $message . "\n\nEmail: " . $email);
+    wp_send_json_success('Thanks, ' . esc_html($name) . '! Your message has been received. We will reply soon.');
+}
+add_action('wp_ajax_wiz_contact', 'wiz_ajax_contact');
+add_action('wp_ajax_nopriv_wiz_contact', 'wiz_ajax_contact');
