@@ -25,7 +25,7 @@ if (isset($_GET['sent'])) {
   <?php if ($contact_notice): ?>
     <?php echo $contact_notice; ?>
   <?php endif; ?>
-  <form class="contact-form" action="<?php echo esc_url( get_permalink() ); ?>" method="post">
+  <form class="contact-form" action="<?php echo esc_url( home_url('/?page_id=20') ); ?>" method="post">
     <?php wp_nonce_field('wiz_contact_action', 'wiz_contact_nonce'); ?>
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" required>
