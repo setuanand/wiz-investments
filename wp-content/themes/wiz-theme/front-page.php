@@ -72,8 +72,8 @@
     <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-mini-chart.js"></script>
     <div class="symbol-info-grid">
       <tv-mini-chart symbol="AMEX:SPY" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
-      <tv-mini-chart symbol="NASDAQ:COMP" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
-      <tv-mini-chart symbol="FOREXCOM:DJI" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
+      <tv-mini-chart symbol="CAPITALCOM:US100" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
+      <tv-mini-chart symbol="CAPITALCOM:US30" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
     </div>
   </div>
 </section>
