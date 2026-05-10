@@ -84,47 +84,59 @@
 </section>
 
 <!-- =============================================
-     SYMBOL INFO STRIP — key market snapshots
+     MINI CHART STRIP — S&P 500, Bitcoin, Gold
      ============================================= -->
 <section class="section" style="padding-top: 0; padding-bottom: 0;">
   <div class="container">
     <div class="symbol-info-grid">
 
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+      <div class="tradingview-widget-container" style="height:220px;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
         {
           "symbol": "FOREXCOM:SPXUSD",
           "width": "100%",
+          "height": "100%",
           "locale": "en",
+          "dateRange": "1M",
           "colorTheme": "dark",
-          "isTransparent": true
+          "isTransparent": true,
+          "autosize": false,
+          "largeChartUrl": ""
         }
         </script>
       </div>
 
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+      <div class="tradingview-widget-container" style="height:220px;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
         {
           "symbol": "BITSTAMP:BTCUSD",
           "width": "100%",
+          "height": "100%",
           "locale": "en",
+          "dateRange": "1M",
           "colorTheme": "dark",
-          "isTransparent": true
+          "isTransparent": true,
+          "autosize": false,
+          "largeChartUrl": ""
         }
         </script>
       </div>
 
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+      <div class="tradingview-widget-container" style="height:220px;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
         {
           "symbol": "TVC:GOLD",
           "width": "100%",
+          "height": "100%",
           "locale": "en",
+          "dateRange": "1M",
           "colorTheme": "dark",
-          "isTransparent": true
+          "isTransparent": true,
+          "autosize": false,
+          "largeChartUrl": ""
         }
         </script>
       </div>
