@@ -23,7 +23,7 @@
         { "description": "Crude Oil",   "proName": "TVC:USOIL" }
       ],
       "showSymbolLogo": true,
-      "isTransparent": false,
+      "isTransparent": true,
       "displayMode": "adaptive",
       "colorTheme": "dark",
       "locale": "en"
@@ -291,6 +291,7 @@
           "isZoomEnabled": true,
           "hasSymbolTooltip": true,
           "isMonoSize": false,
+          "isTransparent": true,
           "width": "100%",
           "height": "100%"
         }
