@@ -1293,3 +1293,176 @@ select.form-control {
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================================
+   ABOUT PAGE
+   ======================================== */
+
+.about-hero {
+  padding: var(--space-2xl) 0;
+  text-align: center;
+}
+
+.about-hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.about-title {
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--text-primary);
+  margin: var(--space-sm) 0 var(--space-lg);
+}
+
+.about-lead {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-xl);
+}
+
+.about-hero-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Mission split layout */
+.about-mission {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+.about-mission-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.about-stat-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: border-color var(--ease);
+}
+
+.about-stat-card:hover { border-color: var(--primary); }
+
+.about-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.about-stat-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.about-stat-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Features grid */
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.about-feature-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  transition: border-color var(--ease), transform var(--ease);
+}
+
+.about-feature-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.about-feature-icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-md);
+}
+
+.about-feature-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.about-feature-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Values */
+.about-values {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.about-value-item {
+  padding: var(--space-lg) 0;
+  border-top: 2px solid var(--border-muted);
+  transition: border-color var(--ease);
+}
+
+.about-value-item:hover { border-top-color: var(--primary); }
+
+.about-value-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--border-default);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: var(--space-md);
+}
+
+.about-value-item h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.about-value-item p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* About responsive */
+@media (max-width: 1024px) {
+  .about-features { grid-template-columns: repeat(2, 1fr); }
+  .about-values { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .about-mission { grid-template-columns: 1fr; }
+  .about-features { grid-template-columns: 1fr; }
+  .about-values { grid-template-columns: 1fr; }
+  .about-mission-stats { grid-template-columns: 1fr 1fr; }
+}
