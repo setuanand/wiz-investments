@@ -5,7 +5,7 @@
      ============================================= -->
 <div class="ticker-section">
   <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
+    <div class="tradingview-widget-container__widget"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
     {
       "symbols": [
@@ -61,87 +61,6 @@
         </a>
       <?php endif; ?>
     </div>
-
-    <div class="hero-stats fade-up">
-      <div class="hero-stat-item">
-        <div class="hero-stat-value">150M+</div>
-        <div class="hero-stat-label">Traders Worldwide</div>
-      </div>
-      <div class="hero-stat-item">
-        <div class="hero-stat-value">50+</div>
-        <div class="hero-stat-label">Exchanges Covered</div>
-      </div>
-      <div class="hero-stat-item">
-        <div class="hero-stat-value">10K+</div>
-        <div class="hero-stat-label">Instruments Tracked</div>
-      </div>
-      <div class="hero-stat-item">
-        <div class="hero-stat-value">99.9%</div>
-        <div class="hero-stat-label">Uptime</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- =============================================
-     MINI CHART STRIP — S&P 500, Bitcoin, Gold
-     ============================================= -->
-<section class="section" style="padding-top: 0; padding-bottom: 0;">
-  <div class="container">
-    <div class="symbol-info-grid">
-
-      <div class="tradingview-widget-container" style="height:220px;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {
-          "symbol": "FOREXCOM:SPXUSD",
-          "width": "100%",
-          "height": "100%",
-          "locale": "en",
-          "dateRange": "1M",
-          "colorTheme": "dark",
-          "isTransparent": true,
-          "autosize": false,
-          "largeChartUrl": ""
-        }
-        </script>
-      </div>
-
-      <div class="tradingview-widget-container" style="height:220px;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {
-          "symbol": "BITSTAMP:BTCUSD",
-          "width": "100%",
-          "height": "100%",
-          "locale": "en",
-          "dateRange": "1M",
-          "colorTheme": "dark",
-          "isTransparent": true,
-          "autosize": false,
-          "largeChartUrl": ""
-        }
-        </script>
-      </div>
-
-      <div class="tradingview-widget-container" style="height:220px;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {
-          "symbol": "TVC:GOLD",
-          "width": "100%",
-          "height": "100%",
-          "locale": "en",
-          "dateRange": "1M",
-          "colorTheme": "dark",
-          "isTransparent": true,
-          "autosize": false,
-          "largeChartUrl": ""
-        }
-        </script>
-      </div>
-
-    </div>
   </div>
 </section>
 
@@ -159,7 +78,6 @@
     <div class="tv-widget-wrap" style="height: 600px;">
       <div class="tradingview-widget-container" style="height:100%;">
         <div id="tradingview_advanced_chart" style="height:100%;"></div>
-        <!-- Load tv.js synchronously so TradingView is defined before init runs -->
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
         (function initChart() {
@@ -168,24 +86,94 @@
             return;
           }
           new TradingView.widget({
-            "autosize":           true,
-            "symbol":             "NASDAQ:AAPL",
-            "interval":           "D",
-            "timezone":           "Etc/UTC",
-            "theme":              "dark",
-            "style":              "1",
-            "locale":             "en",
-            "toolbar_bg":         "#161b22",
-            "enable_publishing":  false,
+            "autosize":            true,
+            "symbol":              "NASDAQ:AAPL",
+            "interval":            "D",
+            "timezone":            "Etc/UTC",
+            "theme":               "dark",
+            "style":               "1",
+            "locale":              "en",
+            "toolbar_bg":          "#161b22",
+            "enable_publishing":   false,
             "allow_symbol_change": true,
-            "container_id":       "tradingview_advanced_chart",
-            "hide_side_toolbar":  false,
-            "withdateranges":     true,
-            "save_image":         false,
-            "backgroundColor":    "#0d1117",
-            "gridColor":          "rgba(48,54,61,0.5)"
+            "container_id":        "tradingview_advanced_chart",
+            "hide_side_toolbar":   false,
+            "withdateranges":      true,
+            "save_image":          false,
+            "backgroundColor":     "rgba(13,17,23,1)",
+            "gridColor":           "rgba(48,54,61,0.5)"
           });
         })();
+        </script>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     STOCK HEATMAP — S&P 500 sectors
+     ============================================= -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Equities</span>
+      <h2 class="section-title">Stock Heatmap</h2>
+      <p class="section-desc">A macro view of S&amp;P 500 performance — see which sectors and stocks are moving right now.</p>
+    </div>
+
+    <div class="tv-widget-wrap" style="height: 500px;">
+      <div class="tradingview-widget-container" style="height:100%;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
+        {
+          "exchanges": [],
+          "dataSource": "SPX500",
+          "grouping": "sector",
+          "blockSize": "market_cap_basic",
+          "blockColor": "change",
+          "locale": "en",
+          "symbolUrl": "",
+          "colorTheme": "dark",
+          "hasTopBar": false,
+          "isDataSetEnabled": false,
+          "isZoomEnabled": true,
+          "hasSymbolTooltip": true,
+          "isMonoSize": false,
+          "isTransparent": true,
+          "width": "100%",
+          "height": "100%"
+        }
+        </script>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CRYPTO HEATMAP — crypto by market cap
+     ============================================= -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Crypto</span>
+      <h2 class="section-title">Crypto Heatmap</h2>
+      <p class="section-desc">Live view of the cryptocurrency market — segmented by market cap and color-coded by performance.</p>
+    </div>
+
+    <div class="tv-widget-wrap" style="height: 500px;">
+      <div class="tradingview-widget-container" style="height:100%;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-crypto-coins-heatmap.js" async>
+        {
+          "dataSource": "Crypto",
+          "blockSize": "market_cap_calc",
+          "blockColor": "change",
+          "locale": "en",
+          "colorTheme": "dark",
+          "isTransparent": true,
+          "width": "100%",
+          "height": "100%"
+        }
         </script>
       </div>
     </div>
@@ -225,79 +213,27 @@
 </section>
 
 <!-- =============================================
-     STOCK HEATMAP
+     ECONOMIC MAP — global macro view
      ============================================= -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
     <div class="section-header">
-      <span class="section-label">Heatmap</span>
-      <h2 class="section-title">Market Heatmap</h2>
-      <p class="section-desc">A macro view of market performance — see which sectors and stocks are moving right now.</p>
+      <span class="section-label">Macro</span>
+      <h2 class="section-title">Economic Map</h2>
+      <p class="section-desc">A global view of key economic indicators — GDP growth, inflation, interest rates, and more by country.</p>
     </div>
 
-    <div class="tv-widget-wrap" style="height: 500px;">
-      <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"><div class="tv-loading-skeleton"></div></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
-        {
-          "exchanges": [],
-          "dataSource": "SPX500",
-          "grouping": "sector",
-          "blockSize": "market_cap_basic",
-          "blockColor": "change",
-          "locale": "en",
-          "symbolUrl": "",
-          "colorTheme": "dark",
-          "hasTopBar": false,
-          "isDataSetEnabled": false,
-          "isZoomEnabled": true,
-          "hasSymbolTooltip": true,
-          "isMonoSize": false,
-          "isTransparent": true,
-          "width": "100%",
-          "height": "100%"
-        }
-        </script>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- =============================================
-     HOTLISTS — top gainers, losers, most active
-     ============================================= -->
-<section class="section" style="padding-top: 0;">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-label">Movers</span>
-      <h2 class="section-title">Top Movers</h2>
-      <p class="section-desc">Today&#39;s biggest gainers, losers, and most active stocks — updated in real time.</p>
-    </div>
-
-    <div class="tv-widget-wrap" style="height: 500px;">
+    <div class="tv-widget-wrap" style="height: 550px;">
       <div class="tradingview-widget-container" style="height:100%;">
         <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-economic-map.js" async>
         {
           "colorTheme": "dark",
-          "dateRange": "1D",
-          "exchange": "US",
-          "showChart": true,
-          "locale": "en",
           "isTransparent": true,
-          "showSymbolLogo": true,
-          "showFloatingTooltip": false,
           "width": "100%",
           "height": "100%",
-          "plotLineColorGrowing": "rgba(41,98,255,1)",
-          "plotLineColorFalling": "rgba(239,83,80,1)",
-          "gridLineColor": "rgba(48,54,61,1)",
-          "scaleFontColor": "rgba(139,148,158,1)",
-          "belowLineFillColorGrowing": "rgba(41,98,255,0.12)",
-          "belowLineFillColorFalling": "rgba(239,83,80,0.12)",
-          "belowLineFillColorGrowingBottom": "rgba(41,98,255,0)",
-          "belowLineFillColorFallingBottom": "rgba(239,83,80,0)",
-          "symbolActiveColor": "rgba(41,98,255,0.12)"
+          "locale": "en",
+          "backgroundColor": "#0d1117"
         }
         </script>
       </div>
