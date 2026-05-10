@@ -65,14 +65,35 @@
 </section>
 
 <!-- =============================================
-     MINI CHART TEST — S&P 500 web component
+     MINI CHARTS — S&P 500, Nasdaq, Dow Jones
      ============================================= -->
 <section class="section" style="padding-top: 0; padding-bottom: 0;">
   <div class="container">
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-mini-chart.js"></script>
     <div class="symbol-info-grid">
-      <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-mini-chart.js"></script>
       <tv-mini-chart symbol="FOREXCOM:SPXUSD" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
+      <tv-mini-chart symbol="FOREXCOM:NSXUSD" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
+      <tv-mini-chart symbol="FOREXCOM:DJI"    theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
     </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SYMBOL OVERVIEW — comparison chart S&P vs Nasdaq vs Gold
+     ============================================= -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Compare</span>
+      <h2 class="section-title">Index Comparison</h2>
+      <p class="section-desc">Compare S&amp;P 500, Nasdaq 100, and Gold side by side — performance, trends, and momentum.</p>
+    </div>
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-symbol-overview.js"></script>
+    <tv-symbol-overview
+      symbols="FOREXCOM:SPXUSD|S&P 500;FOREXCOM:NSXUSD|Nasdaq 100;TVC:GOLD|Gold"
+      theme="dark"
+      style="width:100%; height:500px;">
+    </tv-symbol-overview>
   </div>
 </section>
 
@@ -121,6 +142,43 @@
     </div>
   </div>
 </section>
+
+<!-- =============================================
+     MARKET OVERVIEW — tabbed stocks/crypto/forex/indices
+     ============================================= -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Live Markets</span>
+      <h2 class="section-title">Market Overview</h2>
+      <p class="section-desc">Real-time prices across stocks, crypto, forex, and indices — all in one place.</p>
+    </div>
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-market-overview.js"></script>
+    <tv-market-overview
+      theme="dark"
+      style="width:100%; height:500px;">
+    </tv-market-overview>
+  </div>
+</section>
+
+<!-- =============================================
+     MARKET QUOTES — live price table
+     ============================================= -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Prices</span>
+      <h2 class="section-title">Live Prices</h2>
+      <p class="section-desc">Real-time quotes for key stocks, indices, crypto, and commodities.</p>
+    </div>
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-market-quotes.js"></script>
+    <tv-market-quotes
+      theme="dark"
+      style="width:100%; height:400px;">
+    </tv-market-quotes>
+  </div>
+</section>
+
 
 <!-- =============================================
      STOCK HEATMAP — S&P 500 sectors
