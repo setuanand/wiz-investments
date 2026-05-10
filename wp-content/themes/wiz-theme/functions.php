@@ -244,7 +244,7 @@ function wiz_reset_password_with_token($token, $new_password, $confirm_password)
         return array('success' => false, 'message' => 'Passwords do not match.');
     $verify = wiz_verify_password_reset_token($token);
     if (!$verify['success']) return $verify;
-    wp_set_user_password($verify['user_id'], $new_password);
+    wp_set_password($new_password, $verify["user_id"]);
     delete_user_meta($verify['user_id'], 'password_reset_token');
     delete_user_meta($verify['user_id'], 'password_reset_expiry');
     return array('success' => true, 'message' => 'Password reset successfully! You can now log in.');
