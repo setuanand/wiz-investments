@@ -193,80 +193,30 @@
 </section>
 
 <!-- =============================================
-     MARKET OVERVIEW — tabbed live data
+     FOREX HEATMAP — currency strength
      ============================================= -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
     <div class="section-header">
-      <span class="section-label">Live Markets</span>
-      <h2 class="section-title">Market Overview</h2>
-      <p class="section-desc">Real-time prices across stocks, crypto, forex, and indices — all in one place.</p>
+      <span class="section-label">Forex</span>
+      <h2 class="section-title">Currency Heatmap</h2>
+      <p class="section-desc">See which currencies are strongest and weakest against each other — updated in real time.</p>
     </div>
 
     <div class="tv-widget-wrap" style="height: 500px;">
       <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"><div class="tv-loading-skeleton"></div></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js" async>
         {
-          "colorTheme": "dark",
-          "dateRange": "12M",
-          "showChart": true,
-          "locale": "en",
-          "largeChartUrl": "",
-          "isTransparent": true,
-          "showSymbolLogo": true,
-          "showFloatingTooltip": false,
           "width": "100%",
           "height": "100%",
-          "tabs": [
-            {
-              "title": "Stocks",
-              "symbols": [
-                { "s": "NASDAQ:AAPL",  "d": "Apple" },
-                { "s": "NASDAQ:NVDA",  "d": "NVIDIA" },
-                { "s": "NASDAQ:MSFT",  "d": "Microsoft" },
-                { "s": "NASDAQ:AMZN",  "d": "Amazon" },
-                { "s": "NASDAQ:GOOGL", "d": "Alphabet" },
-                { "s": "NASDAQ:TSLA",  "d": "Tesla" },
-                { "s": "NASDAQ:META",  "d": "Meta" }
-              ],
-              "originalTitle": "Stocks"
-            },
-            {
-              "title": "Crypto",
-              "symbols": [
-                { "s": "BITSTAMP:BTCUSD",  "d": "Bitcoin" },
-                { "s": "BITSTAMP:ETHUSD",  "d": "Ethereum" },
-                { "s": "BINANCE:SOLUSDT",  "d": "Solana" },
-                { "s": "BINANCE:BNBUSDT",  "d": "BNB" },
-                { "s": "BINANCE:XRPUSDT",  "d": "XRP" },
-                { "s": "BINANCE:ADAUSDT",  "d": "Cardano" }
-              ],
-              "originalTitle": "Crypto"
-            },
-            {
-              "title": "Forex",
-              "symbols": [
-                { "s": "FX:EURUSD", "d": "EUR/USD" },
-                { "s": "FX:GBPUSD", "d": "GBP/USD" },
-                { "s": "FX:USDJPY", "d": "USD/JPY" },
-                { "s": "FX:AUDUSD", "d": "AUD/USD" },
-                { "s": "FX:USDCAD", "d": "USD/CAD" }
-              ],
-              "originalTitle": "Forex"
-            },
-            {
-              "title": "Indices",
-              "symbols": [
-                { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
-                { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
-                { "s": "FOREXCOM:DJI",    "d": "Dow Jones" },
-                { "s": "INDEX:DEU40",     "d": "DAX" },
-                { "s": "INDEX:NKY",       "d": "Nikkei 225" }
-              ],
-              "originalTitle": "Indices"
-            }
-          ]
+          "currencies": [
+            "EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD"
+          ],
+          "isTransparent": true,
+          "colorTheme": "dark",
+          "locale": "en",
+          "backgroundColor": "#0d1117"
         }
         </script>
       </div>
@@ -314,30 +264,40 @@
 </section>
 
 <!-- =============================================
-     STOCK SCREENER — top movers
+     HOTLISTS — top gainers, losers, most active
      ============================================= -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
     <div class="section-header">
-      <span class="section-label">Screener</span>
-      <h2 class="section-title">Stock Screener</h2>
-      <p class="section-desc">Filter and discover stocks by performance, volume, volatility, and fundamentals — updated in real time.</p>
+      <span class="section-label">Movers</span>
+      <h2 class="section-title">Top Movers</h2>
+      <p class="section-desc">Today&#39;s biggest gainers, losers, and most active stocks — updated in real time.</p>
     </div>
 
-    <div class="tv-widget-wrap" style="height: 550px;">
+    <div class="tv-widget-wrap" style="height: 500px;">
       <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"><div class="tv-loading-skeleton"></div></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async>
         {
+          "colorTheme": "dark",
+          "dateRange": "1D",
+          "exchange": "US",
+          "showChart": true,
+          "locale": "en",
+          "isTransparent": true,
+          "showSymbolLogo": true,
+          "showFloatingTooltip": false,
           "width": "100%",
           "height": "100%",
-          "defaultColumn": "overview",
-          "defaultScreen": "most_capitalized",
-          "market": "america",
-          "showToolbar": true,
-          "colorTheme": "dark",
-          "locale": "en",
-          "isTransparent": true
+          "plotLineColorGrowing": "rgba(41,98,255,1)",
+          "plotLineColorFalling": "rgba(239,83,80,1)",
+          "gridLineColor": "rgba(48,54,61,1)",
+          "scaleFontColor": "rgba(139,148,158,1)",
+          "belowLineFillColorGrowing": "rgba(41,98,255,0.12)",
+          "belowLineFillColorFalling": "rgba(239,83,80,0.12)",
+          "belowLineFillColorGrowingBottom": "rgba(41,98,255,0)",
+          "belowLineFillColorFallingBottom": "rgba(239,83,80,0)",
+          "symbolActiveColor": "rgba(41,98,255,0.12)"
         }
         </script>
       </div>
