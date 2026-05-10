@@ -11,53 +11,80 @@ if (!is_user_logged_in()) {
 
 $user          = wp_get_current_user();
 $investor_type = get_user_meta($user->ID, 'investor_type', true) ?: 'subscriber';
+$member_since  = date('F j, Y', strtotime($user->user_registered));
 ?>
 
-<div class="container dashboard-container">
-    <div class="dashboard-header">
-        <h1>Welcome, <?php echo esc_html($user->user_email); ?>!</h1>
-        <p class="dashboard-subtitle">Member Dashboard</p>
+<div class="dashboard-page">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="dashboard-page-header">
+      <div>
+        <span class="section-label">Member Area</span>
+        <h1 class="dashboard-page-title">Welcome back!</h1>
+        <p class="dashboard-page-sub"><?php echo esc_html($user->user_email); ?></p>
+      </div>
+      <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="btn btn-secondary">Logout</a>
     </div>
 
-    <div class="dashboard-grid">
-        <div class="dashboard-card">
-            <h3>Account Information</h3>
-            <div class="dashboard-info">
-                <p><strong>Email:</strong> <?php echo esc_html($user->user_email); ?></p>
-                <p><strong>Account Type:</strong> <?php echo esc_html(ucfirst($investor_type)); ?></p>
-                <p><strong>Member Since:</strong> <?php echo esc_html(date('F j, Y', strtotime($user->user_registered))); ?></p>
-            </div>
-        </div>
+    <!-- Top cards -->
+    <div class="dashboard-top-grid">
 
-        <div class="dashboard-card">
-            <h3>Account Actions</h3>
-            <ul class="dashboard-actions">
-                <li><a href="<?php echo esc_url(wiz_get_page_url_by_slug('edit-profile')); ?>" class="btn btn-secondary">Edit Profile</a></li>
-                <li><a href="<?php echo esc_url(wiz_get_page_url_by_slug('change-password')); ?>" class="btn btn-secondary">Change Password</a></li>
-            </ul>
-        </div>
+      <div class="dashboard-card dashboard-card--info">
+        <div class="dashboard-card-label">Account Type</div>
+        <div class="dashboard-card-value"><?php echo esc_html(ucfirst($investor_type)); ?></div>
+        <div class="dashboard-card-meta">Member since <?php echo esc_html($member_since); ?></div>
+      </div>
+
+      <div class="dashboard-card dashboard-card--info">
+        <div class="dashboard-card-label">Email</div>
+        <div class="dashboard-card-value" style="font-size: 1rem; word-break: break-all;"><?php echo esc_html($user->user_email); ?></div>
+        <div class="dashboard-card-meta">Verified account</div>
+      </div>
+
+      <div class="dashboard-card dashboard-card--info">
+        <div class="dashboard-card-label">Status</div>
+        <div class="dashboard-card-value" style="color: var(--gain);">Active</div>
+        <div class="dashboard-card-meta">All services available</div>
+      </div>
+
     </div>
 
-    <div class="dashboard-section">
-        <h2>Member Resources</h2>
-        <div class="resources-grid">
-            <div class="resource-card">
-                <h4>Analytics Dashboard</h4>
-                <p>View simulated trading scenarios and analytics.</p>
-                <a href="<?php echo esc_url(wiz_get_page_url_by_slug('analytics-dashboard')); ?>" class="btn btn-primary">Go to Analytics</a>
-            </div>
+    <!-- Quick actions -->
+    <h2 class="dashboard-section-title">Quick Access</h2>
+    <div class="dashboard-resources-grid">
 
-            <div class="resource-card">
-                <h4>Contact Support</h4>
-                <p>Have questions? Reach out to our support team.</p>
-                <a href="<?php echo esc_url(wiz_get_page_url_by_slug('contact')); ?>" class="btn btn-primary">Contact Us</a>
-            </div>
-        </div>
+      <div class="dashboard-resource-card">
+        <div class="dashboard-resource-icon">📊</div>
+        <h3>Analytics Dashboard</h3>
+        <p>Run trading simulations, view equity curves, and analyse performance metrics.</p>
+        <a href="<?php echo esc_url(wiz_get_page_url_by_slug('analytics-dashboard')); ?>" class="btn btn-primary">Go to Analytics</a>
+      </div>
+
+      <div class="dashboard-resource-card">
+        <div class="dashboard-resource-icon">👤</div>
+        <h3>Edit Profile</h3>
+        <p>Update your investor type and account preferences.</p>
+        <a href="<?php echo esc_url(wiz_get_page_url_by_slug('edit-profile')); ?>" class="btn btn-secondary">Edit Profile</a>
+      </div>
+
+      <div class="dashboard-resource-card">
+        <div class="dashboard-resource-icon">🔑</div>
+        <h3>Change Password</h3>
+        <p>Update your account password to keep your account secure.</p>
+        <a href="<?php echo esc_url(wiz_get_page_url_by_slug('change-password')); ?>" class="btn btn-secondary">Change Password</a>
+      </div>
+
+      <div class="dashboard-resource-card">
+        <div class="dashboard-resource-icon">✉️</div>
+        <h3>Contact Support</h3>
+        <p>Have a question or need help? Our team responds within 24 hours.</p>
+        <a href="<?php echo esc_url(wiz_get_page_url_by_slug('contact')); ?>" class="btn btn-secondary">Contact Us</a>
+      </div>
+
     </div>
 
-    <div class="dashboard-footer">
-        <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="btn btn-danger" style="margin-top: 2rem; display: inline-block;">Logout</a>
-    </div>
+  </div>
 </div>
 
 <?php get_footer(); ?>
