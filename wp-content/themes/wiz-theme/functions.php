@@ -387,3 +387,45 @@ function wiz_ajax_contact() {
 }
 add_action('wp_ajax_wiz_contact', 'wiz_ajax_contact');
 add_action('wp_ajax_nopriv_wiz_contact', 'wiz_ajax_contact');
+
+// ===================== PASSWORD RESET AJAX =====================
+
+function wiz_ajax_reset_password() {
+    if (!isset($_POST['wiz_nonce']) || !wp_verify_nonce($_POST['wiz_nonce'], 'wiz_reset_nonce')) {
+        wp_send_json_error('Security check failed. Please refresh and try again.');
+    }
+    $token            = sanitize_text_field($_POST['token'] ?? '');
+    $new_password     = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+
+    if (empty($token)) {
+        wp_send_json_error('Invalid reset token.');
+    }
+
+    $result = wiz_reset_password_with_token($token, $new_password, $confirm_password);
+
+    if ($result['success']) {
+        wp_send_json_success('Password reset successfully! You can now log in with your new password.');
+    } else {
+        wp_send_json_error($result['message']);
+    }
+}
+add_action('wp_ajax_wiz_reset_password', 'wiz_ajax_reset_password');
+add_action('wp_ajax_nopriv_wiz_reset_password', 'wiz_ajax_reset_password');
+
+// ===================== FORGOT PASSWORD AJAX =====================
+
+function wiz_ajax_forgot_password() {
+    if (!isset($_POST['wiz_nonce']) || !wp_verify_nonce($_POST['wiz_nonce'], 'wiz_forgot_nonce')) {
+        wp_send_json_error('Security check failed. Please refresh and try again.');
+    }
+    $email  = sanitize_email($_POST['email'] ?? '');
+    $result = wiz_request_password_reset($email);
+    if ($result['success']) {
+        wp_send_json_success($result['message']);
+    } else {
+        wp_send_json_error($result['message']);
+    }
+}
+add_action('wp_ajax_wiz_forgot_password', 'wiz_ajax_forgot_password');
+add_action('wp_ajax_nopriv_wiz_forgot_password', 'wiz_ajax_forgot_password');

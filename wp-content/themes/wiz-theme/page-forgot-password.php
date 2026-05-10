@@ -3,17 +3,6 @@
 Template Name: Forgot Password
 */
 get_header();
-
-$message      = '';
-$message_type = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wiz_forgot_submit'])) {
-    check_admin_referer('wiz_forgot_nonce', 'wiz_nonce');
-    $email  = sanitize_email($_POST['email'] ?? '');
-    $result = wiz_request_password_reset($email);
-    $message      = $result['message'];
-    $message_type = $result['success'] ? 'success' : 'error';
-}
 ?>
 
 <div class="auth-container">
@@ -23,18 +12,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wiz_forgot_submit']))
       <p class="auth-subtitle">Enter your email and we'll send you a reset link</p>
     </div>
 
-    <?php if (!empty($message)) : ?>
-      <div class="form-notice <?php echo esc_attr($message_type); ?>"><?php echo esc_html($message); ?></div>
-    <?php endif; ?>
+    <div id="forgot-notice"></div>
 
-    <form method="POST" class="auth-form">
+    <form class="auth-form" id="forgot-form">
       <?php wp_nonce_field('wiz_forgot_nonce', 'wiz_nonce'); ?>
       <div class="form-group">
         <label class="form-label" for="email">Email Address</label>
         <input class="form-input" type="email" id="email" name="email" required placeholder="your@email.com" autofocus>
       </div>
-      <button type="submit" name="wiz_forgot_submit" class="btn btn-primary" style="width:100%;">Send Reset Link</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Send Reset Link</button>
     </form>
+
+    <script>
+    document.getElementById('forgot-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = this;
+        var btn = form.querySelector('button[type="submit"]');
+        var notice = document.getElementById('forgot-notice');
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        var data = new FormData(form);
+        data.append('action', 'wiz_forgot_password');
+        fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+            method: 'POST',
+            body: data
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            notice.innerHTML = '<div class="form-notice ' + (res.success ? 'success' : 'error') + '">' + res.data + '</div>';
+            if (res.success) form.style.display = 'none';
+            btn.disabled = false;
+            btn.textContent = 'Send Reset Link';
+        })
+        .catch(function() {
+            notice.innerHTML = '<div class="form-notice error">Something went wrong. Please try again.</div>';
+            btn.disabled = false;
+            btn.textContent = 'Send Reset Link';
+        });
+    });
+    </script>
 
     <div style="text-align:center; margin-top: var(--space-xl);">
       <a href="<?php echo esc_url(wiz_get_page_url_by_slug('login')); ?>" style="color: var(--text-secondary); font-size: 0.85rem;">&larr; Back to Login</a>
