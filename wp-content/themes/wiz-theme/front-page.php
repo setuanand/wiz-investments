@@ -65,6 +65,18 @@
 </section>
 
 <!-- =============================================
+     MINI CHART TEST — S&P 500 web component
+     ============================================= -->
+<section class="section" style="padding-top: 0; padding-bottom: 0;">
+  <div class="container">
+    <div class="symbol-info-grid">
+      <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-mini-chart.js"></script>
+      <tv-mini-chart symbol="FOREXCOM:SPXUSD" theme="dark" style="width:100%; height:220px;"></tv-mini-chart>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
      ADVANCED CHART — loads reliably on first visit
      ============================================= -->
 <section class="section">
@@ -203,35 +215,6 @@
           ],
           "isTransparent": true,
           "colorTheme": "dark",
-          "locale": "en",
-          "backgroundColor": "#0d1117"
-        }
-        </script>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- =============================================
-     ECONOMIC MAP — global macro view
-     ============================================= -->
-<section class="section" style="padding-top: 0;">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-label">Macro</span>
-      <h2 class="section-title">Economic Map</h2>
-      <p class="section-desc">A global view of key economic indicators — GDP growth, inflation, interest rates, and more by country.</p>
-    </div>
-
-    <div class="tv-widget-wrap" style="height: 550px;">
-      <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-economic-map.js" async>
-        {
-          "colorTheme": "dark",
-          "isTransparent": true,
-          "width": "100%",
-          "height": "100%",
           "locale": "en",
           "backgroundColor": "#0d1117"
         }
