@@ -5,7 +5,7 @@
      ============================================= -->
 <div class="ticker-section">
   <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"></div>
+    <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
     {
       "symbols": [
@@ -91,7 +91,7 @@
     <div class="symbol-info-grid">
 
       <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
         {
           "symbol": "FOREXCOM:SPXUSD",
@@ -104,7 +104,7 @@
       </div>
 
       <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
         {
           "symbol": "BITSTAMP:BTCUSD",
@@ -117,7 +117,7 @@
       </div>
 
       <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-container__widget"><div class="tv-loading-skeleton"></div></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
         {
           "symbol": "TVC:GOLD",
@@ -193,7 +193,7 @@
 
     <div class="tv-widget-wrap" style="height: 500px;">
       <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <div class="tradingview-widget-container__widget" style="height:100%;"><div class="tv-loading-skeleton"></div></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
         {
           "colorTheme": "dark",
@@ -275,7 +275,7 @@
 
     <div class="tv-widget-wrap" style="height: 500px;">
       <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <div class="tradingview-widget-container__widget" style="height:100%;"><div class="tv-loading-skeleton"></div></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
         {
           "exchanges": [],
@@ -313,7 +313,7 @@
 
     <div class="tv-widget-wrap" style="height: 550px;">
       <div class="tradingview-widget-container" style="height:100%;">
-        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <div class="tradingview-widget-container__widget" style="height:100%;"><div class="tv-loading-skeleton"></div></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
         {
           "width": "100%",
