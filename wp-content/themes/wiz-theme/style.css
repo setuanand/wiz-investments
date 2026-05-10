@@ -495,6 +495,28 @@ p { color: var(--text-secondary); line-height: 1.7; }
   overflow: hidden;
 }
 
+/* Symbol Info Strip — 3 cards across */
+.symbol-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
+}
+
+.symbol-info-grid .tradingview-widget-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 160px;
+}
+
+@media (max-width: 768px) {
+  .symbol-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ========================================
    SERVICES
    ======================================== */
