@@ -79,23 +79,60 @@
 </section>
 
 <!-- =============================================
-     SYMBOL OVERVIEW — comparison chart S&P vs Nasdaq vs Gold
+     SYMBOL OVERVIEW — S&P 500, Nasdaq, Dow comparison
      ============================================= -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
     <div class="section-header">
       <span class="section-label">Compare</span>
       <h2 class="section-title">Index Comparison</h2>
-      <p class="section-desc">Compare S&amp;P 500, Nasdaq 100, and Gold side by side — performance, trends, and momentum.</p>
+      <p class="section-desc">Compare S&amp;P 500, Nasdaq 100, and Dow Jones side by side — performance, trends, and momentum.</p>
     </div>
-    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-symbol-overview.js"></script>
-    <tv-symbol-overview
-      symbols="FOREXCOM:SPXUSD|S&P 500;FOREXCOM:NSXUSD|Nasdaq 100;TVC:GOLD|Gold"
-      theme="dark"
-      style="width:100%; height:500px;">
-    </tv-symbol-overview>
+    <div class="tv-widget-wrap" style="height: 500px;">
+      <div class="tradingview-widget-container" style="height:100%;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+        {
+          "symbols": [
+            ["S&P 500", "FOREXCOM:SPXUSD|1D"],
+            ["Nasdaq 100", "FOREXCOM:NSXUSD|1D"],
+            ["Dow Jones", "FOREXCOM:DJI|1D"]
+          ],
+          "chartType": "area",
+          "lineWidth": 2,
+          "lineType": 0,
+          "colorTheme": "dark",
+          "isTransparent": true,
+          "locale": "en",
+          "backgroundColor": "rgba(13,17,23,0)",
+          "upColor": "#26a69a",
+          "downColor": "#ef5350",
+          "borderUpColor": "#26a69a",
+          "borderDownColor": "#ef5350",
+          "wickUpColor": "#26a69a",
+          "wickDownColor": "#ef5350",
+          "dateRanges": ["1d|1","1m|30","3m|60","12m|1D","60m|1W","all|1M"],
+          "autosize": true,
+          "width": "100%",
+          "height": "100%",
+          "fontSize": "10",
+          "headerFontSize": "medium",
+          "noTimeScale": false,
+          "hideDateRanges": false,
+          "hideMarketStatus": false,
+          "hideSymbolLogo": false,
+          "chartOnly": false,
+          "scalePosition": "right",
+          "scaleMode": "Normal",
+          "valuesTracking": "1",
+          "changeMode": "price-and-percent"
+        }
+        </script>
+      </div>
+    </div>
   </div>
 </section>
+
 
 <!-- =============================================
      ADVANCED CHART — loads reliably on first visit
@@ -144,38 +181,154 @@
 </section>
 
 <!-- =============================================
-     MARKET OVERVIEW — tabbed stocks/crypto/forex/indices
+     MARKET OVERVIEW — indices, futures, bonds, forex
      ============================================= -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
     <div class="section-header">
-      <span class="section-label">Live Markets</span>
+      <span class="section-label">World Markets</span>
       <h2 class="section-title">Market Overview</h2>
-      <p class="section-desc">Real-time prices across stocks, crypto, forex, and indices — all in one place.</p>
+      <p class="section-desc">Global indices, futures, bonds, and forex — all in one view, updated in real time.</p>
     </div>
-    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-market-overview.js"></script>
-    <tv-market-overview
-      theme="dark"
-      style="width:100%; height:500px;">
-    </tv-market-overview>
+    <div class="tv-widget-wrap" style="height: 550px;">
+      <div class="tradingview-widget-container" style="height:100%;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+        {
+          "colorTheme": "dark",
+          "dateRange": "12M",
+          "locale": "en",
+          "isTransparent": true,
+          "showFloatingTooltip": false,
+          "showSymbolLogo": true,
+          "showChart": true,
+          "width": "100%",
+          "height": "100%",
+          "plotLineColorGrowing": "rgba(41,98,255,1)",
+          "plotLineColorFalling": "rgba(239,83,80,1)",
+          "gridLineColor": "rgba(48,54,61,0.5)",
+          "scaleFontColor": "#8b949e",
+          "belowLineFillColorGrowing": "rgba(41,98,255,0.12)",
+          "belowLineFillColorFalling": "rgba(239,83,80,0.12)",
+          "belowLineFillColorGrowingBottom": "rgba(41,98,255,0)",
+          "belowLineFillColorFallingBottom": "rgba(239,83,80,0)",
+          "symbolActiveColor": "rgba(41,98,255,0.12)",
+          "tabs": [
+            {
+              "title": "Indices",
+              "symbols": [
+                { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
+                { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
+                { "s": "FOREXCOM:DJI",    "d": "Dow Jones" },
+                { "s": "INDEX:NKY",       "d": "Nikkei 225" },
+                { "s": "INDEX:DEU40",     "d": "DAX" },
+                { "s": "FOREXCOM:UKXGBP","d": "FTSE 100" }
+              ],
+              "originalTitle": "Indices"
+            },
+            {
+              "title": "Futures",
+              "symbols": [
+                { "s": "CMCMARKETS:GOLD",   "d": "Gold" },
+                { "s": "PYTH:WTI3!",        "d": "WTI Crude Oil" },
+                { "s": "BMFBOVESPA:ISP1!",  "d": "S&P 500 Futures" },
+                { "s": "BMFBOVESPA:EUR1!",  "d": "Euro Futures" },
+                { "s": "BMFBOVESPA:CCM1!",  "d": "Corn" }
+              ],
+              "originalTitle": "Futures"
+            },
+            {
+              "title": "Bonds",
+              "symbols": [
+                { "s": "EUREX:FGBL1!", "d": "Euro Bund" },
+                { "s": "EUREX:FBTP1!", "d": "Euro BTP" },
+                { "s": "EUREX:FGBM1!", "d": "Euro BOBL" }
+              ],
+              "originalTitle": "Bonds"
+            },
+            {
+              "title": "Forex",
+              "symbols": [
+                { "s": "FX:EURUSD", "d": "EUR/USD" },
+                { "s": "FX:GBPUSD", "d": "GBP/USD" },
+                { "s": "FX:USDJPY", "d": "USD/JPY" },
+                { "s": "FX:USDCHF", "d": "USD/CHF" },
+                { "s": "FX:AUDUSD", "d": "AUD/USD" },
+                { "s": "FX:USDCAD", "d": "USD/CAD" }
+              ],
+              "originalTitle": "Forex"
+            }
+          ]
+        }
+        </script>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- =============================================
-     MARKET QUOTES — live price table
+     MARKET DATA — live price table
      ============================================= -->
 <section class="section" style="padding-top: 0;">
   <div class="container">
     <div class="section-header">
-      <span class="section-label">Prices</span>
-      <h2 class="section-title">Live Prices</h2>
-      <p class="section-desc">Real-time quotes for key stocks, indices, crypto, and commodities.</p>
+      <span class="section-label">Live Prices</span>
+      <h2 class="section-title">Market Data</h2>
+      <p class="section-desc">Real-time quotes across indices, futures, bonds, and forex — at a glance.</p>
     </div>
-    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-market-quotes.js"></script>
-    <tv-market-quotes
-      theme="dark"
-      style="width:100%; height:400px;">
-    </tv-market-quotes>
+    <div class="tv-widget-wrap" style="height: 550px;">
+      <div class="tradingview-widget-container" style="height:100%;">
+        <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+        {
+          "colorTheme": "dark",
+          "locale": "en",
+          "isTransparent": true,
+          "showSymbolLogo": true,
+          "backgroundColor": "rgba(13,17,23,0)",
+          "width": "100%",
+          "height": "100%",
+          "symbolsGroups": [
+            {
+              "name": "Indices",
+              "symbols": [
+                { "name": "FOREXCOM:SPXUSD", "displayName": "S&P 500" },
+                { "name": "FOREXCOM:NSXUSD", "displayName": "Nasdaq 100" },
+                { "name": "FOREXCOM:DJI",    "displayName": "Dow Jones" },
+                { "name": "INDEX:NKY",       "displayName": "Nikkei 225" },
+                { "name": "INDEX:DEU40",     "displayName": "DAX" },
+                { "name": "FOREXCOM:UKXGBP","displayName": "FTSE 100" }
+              ]
+            },
+            {
+              "name": "Commodities",
+              "symbols": [
+                { "name": "CMCMARKETS:GOLD",  "displayName": "Gold" },
+                { "name": "TVC:USOIL",        "displayName": "WTI Crude Oil" },
+                { "name": "TVC:SILVER",       "displayName": "Silver" }
+              ]
+            },
+            {
+              "name": "Crypto",
+              "symbols": [
+                { "name": "BITSTAMP:BTCUSD", "displayName": "Bitcoin" },
+                { "name": "BITSTAMP:ETHUSD", "displayName": "Ethereum" }
+              ]
+            },
+            {
+              "name": "Forex",
+              "symbols": [
+                { "name": "FX:EURUSD", "displayName": "EUR/USD" },
+                { "name": "FX:GBPUSD", "displayName": "GBP/USD" },
+                { "name": "FX:USDJPY", "displayName": "USD/JPY" },
+                { "name": "FX:USDCAD", "displayName": "USD/CAD" }
+              ]
+            }
+          ]
+        }
+        </script>
+      </div>
+    </div>
   </div>
 </section>
 
