@@ -262,19 +262,27 @@ function wiz_enqueue_auth_scripts() {
 }
 add_action('wp_enqueue_scripts', 'wiz_enqueue_auth_scripts');
 
-// Contact form AJAX handler
+// ===================== CONTACT FORM AJAX =====================
+
 function wiz_ajax_contact() {
     if (!isset($_POST['wiz_contact_nonce']) || !wp_verify_nonce($_POST['wiz_contact_nonce'], 'wiz_contact_action')) {
         wp_send_json_error('Security check failed. Please refresh and try again.');
     }
     $name    = sanitize_text_field($_POST['name'] ?? '');
     $email   = sanitize_email($_POST['email'] ?? '');
+    $subject = sanitize_text_field($_POST['subject'] ?? 'General Enquiry');
     $message = sanitize_textarea_field($_POST['message'] ?? '');
+
     if (empty($name) || empty($email) || empty($message)) {
         wp_send_json_error('Please complete all fields before submitting.');
     }
+    if (!is_email($email)) {
+        wp_send_json_error('Please enter a valid email address.');
+    }
+
+    // Save to WP admin
     $post_id = wp_insert_post(array(
-        'post_title'   => 'Contact from ' . $name,
+        'post_title'   => '[' . $subject . '] from ' . $name,
         'post_type'    => 'contact_submission',
         'post_content' => $message,
         'post_status'  => 'private',
@@ -284,8 +292,98 @@ function wiz_ajax_contact() {
     }
     update_post_meta($post_id, 'contact_email', $email);
     update_post_meta($post_id, 'contact_name', $name);
-    wp_mail(get_option('admin_email'), 'New Contact Message from ' . $name, $message . "\n\nEmail: " . $email);
-    wp_send_json_success('Thanks, ' . esc_html($name) . '! Your message has been received. We will reply soon.');
+    update_post_meta($post_id, 'contact_subject', $subject);
+
+    // Email to admin (plain text)
+    $admin_email   = get_option('admin_email');
+    $admin_subject = 'New Contact: [' . $subject . '] from ' . $name;
+    $admin_body    = "You have received a new message via WizInvestments.\n\n"
+                   . "Name:    " . $name . "\n"
+                   . "Email:   " . $email . "\n"
+                   . "Subject: " . $subject . "\n"
+                   . "Message:\n" . $message . "\n\n"
+                   . "---\nReply directly to this email to respond.";
+    wp_mail($admin_email, $admin_subject, $admin_body, array('Reply-To: ' . $name . ' <' . $email . '>'));
+
+    // Confirmation email to sender (HTML)
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: WizInvestments <' . $admin_email . '>',
+    );
+    $confirm_subject = 'We received your message — WizInvestments';
+    $confirm_body    = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { margin: 0; padding: 0; background-color: #0d1117; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrapper { max-width: 580px; margin: 0 auto; padding: 40px 20px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; }
+  .header { background: #161b22; border-bottom: 1px solid #30363d; padding: 32px 40px; text-align: center; }
+  .logo { font-size: 24px; font-weight: 800; color: #e6edf3; letter-spacing: -0.02em; }
+  .logo span { color: #2962ff; }
+  .body { padding: 40px; }
+  .greeting { font-size: 22px; font-weight: 700; color: #e6edf3; margin: 0 0 12px; }
+  .text { font-size: 15px; color: #8b949e; line-height: 1.7; margin: 0 0 24px; }
+  .summary { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+  .summary-row { display: flex; padding: 8px 0; border-bottom: 1px solid #21262d; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-label { font-size: 12px; font-weight: 600; color: #484f58; text-transform: uppercase; letter-spacing: 0.08em; width: 80px; flex-shrink: 0; padding-top: 2px; }
+  .summary-value { font-size: 14px; color: #e6edf3; flex: 1; word-break: break-word; }
+  .message-box { background: #0d1117; border: 1px solid #30363d; border-left: 3px solid #2962ff; border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-size: 14px; color: #8b949e; line-height: 1.7; white-space: pre-wrap; }
+  .cta { text-align: center; margin: 32px 0 8px; }
+  .btn { display: inline-block; background: #2962ff; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .footer { padding: 24px 40px; text-align: center; border-top: 1px solid #30363d; }
+  .footer-text { font-size: 12px; color: #484f58; line-height: 1.6; margin: 0; }
+  .footer-text a { color: #2962ff; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="header">
+      <div class="logo">Wiz<span>Investments</span></div>
+    </div>
+    <div class="body">
+      <p class="greeting">Thanks, ' . esc_html($name) . '!</p>
+      <p class="text">We have received your message and will get back to you within 24 hours on business days. Here is a summary of what you sent us:</p>
+      <div class="summary">
+        <div class="summary-row">
+          <span class="summary-label">Name</span>
+          <span class="summary-value">' . esc_html($name) . '</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Email</span>
+          <span class="summary-value">' . esc_html($email) . '</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Subject</span>
+          <span class="summary-value">' . esc_html($subject) . '</span>
+        </div>
+      </div>
+      <div class="message-box">' . esc_html($message) . '</div>
+      <p class="text">While you wait, feel free to explore our analytics dashboard or learn more about our services.</p>
+      <div class="cta">
+        <a href="' . esc_url(home_url('/analytics-dashboard/')) . '" class="btn">Explore Analytics</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p class="footer-text">
+        You are receiving this because you submitted a message on <a href="' . esc_url(home_url()) . '">WizInvestments</a>.<br>
+        &copy; ' . date('Y') . ' WizInvestments &nbsp;&bull;&nbsp;
+        <a href="' . esc_url(home_url('/privacy-policy/')) . '">Privacy Policy</a> &nbsp;&bull;&nbsp;
+        <a href="' . esc_url(home_url('/terms-of-service/')) . '">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+</div>
+</body>
+</html>';
+
+    wp_mail($email, $confirm_subject, $confirm_body, $headers);
+
+    wp_send_json_success('Thanks, ' . esc_html($name) . '! Your message has been received. Check your inbox for a confirmation email.');
 }
 add_action('wp_ajax_wiz_contact', 'wiz_ajax_contact');
 add_action('wp_ajax_nopriv_wiz_contact', 'wiz_ajax_contact');
