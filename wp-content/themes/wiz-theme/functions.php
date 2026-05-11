@@ -11,6 +11,16 @@ function wiz_theme_setup() {
 }
 add_action('after_setup_theme', 'wiz_theme_setup');
 
+// ===================== ADMIN BAR =====================
+// Hide WordPress admin bar for all non-admin users
+function wiz_hide_admin_bar() {
+    if (!current_user_can('administrator')) {
+        show_admin_bar(false);
+    }
+}
+add_action('after_setup_theme', 'wiz_hide_admin_bar');
+
+
 function wiz_theme_scripts() {
     wp_enqueue_style('wiz-style', get_stylesheet_uri(), array(), filemtime(get_stylesheet_directory() . '/style.css'));
     wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), '4.3.0', true);
