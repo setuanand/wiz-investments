@@ -1695,6 +1695,20 @@ select.form-control {
 
 .dashboard-card--info {
   text-align: left;
+  background: var(--bg-surface);
+  border-color: var(--border-muted);
+}
+
+.dashboard-card--info .dashboard-card-value {
+  color: var(--text-primary);
+}
+
+.dashboard-card--info .dashboard-card-label {
+  color: var(--primary);
+}
+
+.dashboard-card--info .dashboard-card-meta {
+  color: var(--text-secondary);
 }
 
 .dashboard-card-label {
@@ -1782,4 +1796,37 @@ select.form-control {
   .analytics-controls { grid-template-columns: 1fr 1fr; }
   .analytics-page-header { flex-direction: column; }
   .dashboard-page-header { flex-direction: column; }
+}
+
+/* ========================================
+   DASHBOARD CARD DARK OVERRIDE
+   Ensures dashboard cards stay dark even
+   when auth.css white styles are loaded
+   ======================================== */
+
+.dashboard-page .dashboard-card,
+.dashboard-page .dashboard-resource-card {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-muted) !important;
+  color: var(--text-primary) !important;
+}
+
+.dashboard-page .dashboard-card-value {
+  color: var(--text-primary) !important;
+}
+
+.dashboard-page .dashboard-card-label {
+  color: var(--primary) !important;
+}
+
+.dashboard-page .dashboard-card-meta {
+  color: var(--text-secondary) !important;
+}
+
+.dashboard-page .dashboard-resource-card h3 {
+  color: var(--text-primary) !important;
+}
+
+.dashboard-page .dashboard-resource-card p {
+  color: var(--text-secondary) !important;
 }
