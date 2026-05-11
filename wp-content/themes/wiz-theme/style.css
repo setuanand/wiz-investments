@@ -1830,3 +1830,362 @@ select.form-control {
 .dashboard-page .dashboard-resource-card p {
   color: var(--text-secondary) !important;
 }
+
+/* ========================================
+   ANALYTICS DASHBOARD — FULL REDESIGN
+   ======================================== */
+
+/* Tabs */
+.analytics-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  margin-bottom: var(--space-lg);
+}
+
+.analytics-tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-radius: calc(var(--radius-lg) - 4px);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.analytics-tab:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.analytics-tab.active { background: var(--primary); color: #fff; }
+.tab-icon { font-size: 1rem; }
+
+.analytics-tab-content { display: none; }
+.analytics-tab-content.active { display: block; }
+
+/* Portfolio sub-tabs */
+.portfolio-subtabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border-muted);
+  padding-bottom: 0;
+}
+
+.portfolio-subtab {
+  padding: 0.6rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms;
+  margin-bottom: -1px;
+}
+
+.portfolio-subtab:hover { color: var(--text-primary); }
+.portfolio-subtab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.portfolio-subtab-content { display: none; }
+.portfolio-subtab-content.active { display: block; }
+
+/* Sim controls */
+.sim-controls-card { margin-bottom: var(--space-lg); }
+
+.sim-controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.sim-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) auto;
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.sim-controls-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sim-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.chart-wrap {
+  position: relative;
+  height: 280px;
+}
+
+.chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+/* Card section title */
+.card-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0;
+}
+
+/* Metrics grid */
+.sim-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.metric-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: border-color 150ms;
+}
+
+.metric-card:hover { border-color: var(--primary); }
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.metric-value.gain { color: var(--gain); }
+.metric-value.loss { color: var(--loss); }
+
+/* Trade / holdings table */
+.trade-table-wrap { overflow-x: auto; }
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.analytics-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.analytics-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-muted);
+  color: var(--text-secondary);
+}
+
+.analytics-table tr:last-child td { border-bottom: none; }
+.analytics-table tr:hover td { background: var(--bg-elevated); }
+.analytics-table .gain { color: var(--gain); font-weight: 600; }
+.analytics-table .loss { color: var(--loss); font-weight: 600; }
+
+/* Data toggle */
+.sim-data-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--border-default);
+  border-radius: 24px;
+  transition: 200ms;
+}
+
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 200ms;
+}
+
+.toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+.badge-premium {
+  font-size: 0.6rem;
+  background: var(--gold);
+  color: #000;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.badge-sim {
+  font-size: 0.65rem;
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Portfolio summary */
+.portfolio-summary-card { margin-bottom: 0; }
+
+.portfolio-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-md);
+}
+
+
+.ps-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ps-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.ps-value.gain { color: var(--gain); }
+.ps-value.loss { color: var(--loss); }
+
+/* Period toggles */
+.period-toggles {
+  display: flex;
+  gap: 4px;
+}
+
+.period-btn {
+  padding: 4px 12px;
+  background: none;
+  border: 1px solid var(--border-muted);
+  border-radius: 99px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.period-btn:hover { border-color: var(--primary); color: var(--primary); }
+.period-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* Add holding form */
+.add-holding-form {
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.holding-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+/* Optimizer */
+.optimizer-assets-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.opt-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Btn sm */
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sim-controls-grid { grid-template-columns: repeat(3, 1fr); }
+  .sim-charts-grid { grid-template-columns: 1fr; }
+  .sim-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .portfolio-summary-grid { grid-template-columns: repeat(3, 1fr); }
+  .analytics-tabs { flex-direction: column; }
+}
+
+@media (max-width: 768px) {
+  .sim-controls-grid { grid-template-columns: 1fr 1fr; }
+  .sim-metrics-grid { grid-template-columns: 1fr 1fr; }
+  .portfolio-summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .holding-form-grid { grid-template-columns: 1fr 1fr; }
+  .optimizer-assets-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
