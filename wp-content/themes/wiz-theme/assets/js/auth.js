@@ -1,74 +1,80 @@
-// Authentication form validation
+// Authentication form validation + password toggle
 
 document.addEventListener('DOMContentLoaded', function() {
-    const registerForm = document.getElementById('register-form');
-    const loginForm = document.getElementById('login-form');
-    const resetForm = document.getElementById('reset-form');
 
-    // Register form validation
+    // =============================================
+    // PASSWORD SHOW/HIDE TOGGLE
+    // Wraps every password input with an eye icon
+    // =============================================
+    document.querySelectorAll('input[type="password"]').forEach(function(input) {
+        // Create wrapper
+        var wrapper = document.createElement('div');
+        wrapper.className = 'password-input-wrap';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        // Create eye button
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'password-toggle';
+        btn.setAttribute('aria-label', 'Show password');
+        btn.innerHTML = eyeIcon();
+        wrapper.appendChild(btn);
+
+        btn.addEventListener('click', function() {
+            var isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.innerHTML = isPassword ? eyeOffIcon() : eyeIcon();
+            btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        });
+    });
+
+    function eyeIcon() {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    }
+
+    function eyeOffIcon() {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    }
+
+    // =============================================
+    // REGISTER FORM VALIDATION
+    // =============================================
+    var registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
-            const email = this.querySelector('#email').value.trim();
-            const password = this.querySelector('#password').value;
-            const passwordConfirm = this.querySelector('#password_confirm').value;
-
-            if (!email || !password || !passwordConfirm) {
-                e.preventDefault();
-                alert('All fields are required.');
-                return;
-            }
-
-            if (password !== passwordConfirm) {
+            var password = this.querySelector('#password').value;
+            var confirm  = this.querySelector('#password_confirm').value;
+            if (password !== confirm) {
                 e.preventDefault();
                 alert('Passwords do not match.');
                 return;
             }
-
             if (password.length < 8) {
                 e.preventDefault();
                 alert('Password must be at least 8 characters.');
-                return;
             }
         });
     }
 
-    // Login form validation
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            const email = this.querySelector('#email').value.trim();
-            const password = this.querySelector('#password').value;
-
-            if (!email || !password) {
-                e.preventDefault();
-                alert('Email and password are required.');
-                return;
-            }
-        });
-    }
-
-    // Reset form validation
+    // =============================================
+    // RESET FORM VALIDATION
+    // =============================================
+    var resetForm = document.getElementById('reset-form');
     if (resetForm) {
         resetForm.addEventListener('submit', function(e) {
-            const newPassword = this.querySelector('#new_password').value;
-            const confirmPassword = this.querySelector('#confirm_password').value;
-
-            if (!newPassword || !confirmPassword) {
-                e.preventDefault();
-                alert('Both password fields are required.');
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
+            var newPwd = this.querySelector('#new_password').value;
+            var confirm = this.querySelector('#confirm_password').value;
+            if (newPwd !== confirm) {
                 e.preventDefault();
                 alert('Passwords do not match.');
                 return;
             }
-
-            if (newPassword.length < 8) {
+            if (newPwd.length < 8) {
                 e.preventDefault();
                 alert('Password must be at least 8 characters.');
-                return;
             }
         });
     }
+
 });

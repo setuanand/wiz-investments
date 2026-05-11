@@ -72,7 +72,10 @@ if (!isset($_GET['token'])) {
             if (res.success) {
                 notice.innerHTML = '<div class="form-notice success">' + res.data + '</div>';
                 form.style.display = 'none';
-                document.getElementById('reset-login-link').style.display = 'block';
+                // Redirect to dashboard after short delay since user is now logged in
+                setTimeout(function() {
+                    window.location.href = '<?php echo esc_url(wiz_get_page_url_by_slug("dashboard")); ?>';
+                }, 1500);
             } else {
                 notice.innerHTML = '<div class="form-notice error">' + res.data + '</div>';
                 btn.disabled = false;

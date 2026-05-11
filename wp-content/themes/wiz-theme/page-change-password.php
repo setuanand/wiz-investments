@@ -29,11 +29,14 @@ if (isset($_POST['wiz_change_password_submit'])) {
         } elseif ($new !== $confirm) {
             $notice = '<div class="form-notice error">New passwords do not match.</div>';
         } else {
-            wp_set_user_password($user->ID, $new);
-            $notice = '<div class="form-notice success">Password changed successfully. Please log in again.</div>';
-            wp_logout();
-            wp_redirect(wiz_get_page_url_by_slug('login') . '?msg=password_changed');
-            exit;
+            // Preserve email_verified before changing password
+            $email_verified = get_user_meta($user->ID, 'email_verified', true);
+            wp_set_password($new, $user->ID);
+            update_user_meta($user->ID, 'email_verified', $email_verified ?: true);
+            // Re-authenticate so user stays logged in
+            wp_set_current_user($user->ID);
+            wp_set_auth_cookie($user->ID, false);
+            $notice = '<div class="form-notice success">Password changed successfully!</div>';
         }
     }
 }

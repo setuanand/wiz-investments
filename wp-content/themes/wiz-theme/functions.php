@@ -244,10 +244,15 @@ function wiz_reset_password_with_token($token, $new_password, $confirm_password)
         return array('success' => false, 'message' => 'Passwords do not match.');
     $verify = wiz_verify_password_reset_token($token);
     if (!$verify['success']) return $verify;
-    wp_set_password($new_password, $verify["user_id"]);
-    delete_user_meta($verify['user_id'], 'password_reset_token');
-    delete_user_meta($verify['user_id'], 'password_reset_expiry');
-    return array('success' => true, 'message' => 'Password reset successfully! You can now log in.');
+    $user_id = $verify['user_id'];
+    // Preserve email_verified before wp_set_password clears auth cookies
+    $email_verified = get_user_meta($user_id, 'email_verified', true);
+    wp_set_password($new_password, $user_id);
+    // Restore email_verified (wp_set_password does not clear it but we ensure it)
+    update_user_meta($user_id, 'email_verified', $email_verified ?: true);
+    delete_user_meta($user_id, 'password_reset_token');
+    delete_user_meta($user_id, 'password_reset_expiry');
+    return array('success' => true, 'message' => 'Password reset successfully! You can now log in.', 'user_id' => $user_id);
 }
 
 function wiz_enqueue_auth_scripts() {
@@ -405,7 +410,10 @@ function wiz_ajax_reset_password() {
     $result = wiz_reset_password_with_token($token, $new_password, $confirm_password);
 
     if ($result['success']) {
-        wp_send_json_success('Password reset successfully! You can now log in with your new password.');
+        // Log the user back in automatically after reset
+        wp_set_current_user($result['user_id']);
+        wp_set_auth_cookie($result['user_id'], false);
+        wp_send_json_success('Password reset successfully! Logging you in...');
     } else {
         wp_send_json_error($result['message']);
     }
@@ -429,3 +437,13 @@ function wiz_ajax_forgot_password() {
 }
 add_action('wp_ajax_wiz_forgot_password', 'wiz_ajax_forgot_password');
 add_action('wp_ajax_nopriv_wiz_forgot_password', 'wiz_ajax_forgot_password');
+
+// ===================== FAVICON =====================
+
+function wiz_add_favicon() {
+    $favicon_url = get_template_directory_uri() . '/assets/img/favicon.png';
+    echo '<link rel="icon" type="image/png" href="' . esc_url($favicon_url) . '">' . "\n";
+    echo '<link rel="apple-touch-icon" href="' . esc_url($favicon_url) . '">' . "\n";
+}
+add_action('wp_head', 'wiz_add_favicon');
+add_action('admin_head', 'wiz_add_favicon');

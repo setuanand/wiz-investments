@@ -515,3 +515,44 @@
     font-size: 12px;
     }
 }
+
+/* ========================================
+   PASSWORD SHOW/HIDE TOGGLE
+   ======================================== */
+
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrap .form-input,
+.password-input-wrap .form-control {
+  width: 100%;
+  padding-right: 3rem !important;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #8b949e);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 150ms;
+  flex-shrink: 0;
+}
+
+.password-toggle:hover {
+  color: var(--text-primary, #e6edf3);
+}
+
+.password-toggle:focus {
+  outline: 2px solid var(--primary, #2962ff);
+  outline-offset: 2px;
+}
