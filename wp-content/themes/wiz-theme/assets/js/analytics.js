@@ -351,9 +351,41 @@
     const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
     const json = await resp.json();
     if (json.success) {
-      holdings = json.data.holdings || [];
+      const serverHoldings = json.data.holdings || [];
+
+      // MIGRATION: if server has no holdings but localStorage does, migrate them up
+      if (serverHoldings.length === 0) {
+        const localRaw = localStorage.getItem('wiz_holdings');
+        if (localRaw) {
+          try {
+            const localHoldings = JSON.parse(localRaw);
+            if (localHoldings && localHoldings.length > 0) {
+              console.log('Migrating ' + localHoldings.length + ' holdings from localStorage to server...');
+              for (const h of localHoldings) {
+                // Normalise field names (localStorage used camelCase, server uses snake_case)
+                await addHoldingToServer({
+                  name:          h.name || h.Name || '',
+                  ticker:        h.ticker || h.Ticker || '',
+                  units:         h.units || h.Units || 0,
+                  buy_price:     h.buyPrice || h.buy_price || h.BuyPrice || 0,
+                  current_price: h.currentPrice || h.current_price || h.CurrentPrice || 0,
+                  date:          h.date || h.Date || new Date().toISOString().split('T')[0],
+                });
+              }
+              localStorage.removeItem('wiz_holdings'); // clear after migration
+              console.log('Migration complete.');
+              return; // addHoldingToServer already calls renderHoldingsTable
+            }
+          } catch(e) {
+            console.warn('localStorage migration failed:', e);
+          }
+        }
+      }
+
+      holdings = serverHoldings;
       renderHoldingsTable();
       if (json.data.summary) updatePortfolioSummaryFromServer(json.data.summary);
+      if (serverHoldings.length > 0) loadSnapshotsFromServer('1M');
     }
   }
 
