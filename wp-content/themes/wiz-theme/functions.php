@@ -1,4 +1,13 @@
 <?php
+
+// ===================== INCLUDES =====================
+require_once get_template_directory() . '/includes/class-wiz-data.php';
+require_once get_template_directory() . '/includes/class-wiz-portfolio.php';
+require_once get_template_directory() . '/includes/class-wiz-ajax.php';
+
+// Register all AJAX endpoints
+add_action('init', ['WizAjax', 'register']);
+
 function wiz_theme_setup() {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
@@ -459,3 +468,13 @@ function wiz_add_favicon() {
 }
 add_action('wp_head', 'wiz_add_favicon');
 add_action('admin_head', 'wiz_add_favicon');
+
+// Localize nonces for JS
+function wiz_localize_nonces() {
+    wp_localize_script('wiz-analytics', 'wizNonces', [
+        'data'      => wp_create_nonce('wiz_data_nonce'),
+        'portfolio' => wp_create_nonce('wiz_portfolio_nonce'),
+        'ajaxUrl'   => admin_url('admin-ajax.php'),
+    ]);
+}
+add_action('wp_enqueue_scripts', 'wiz_localize_nonces', 20);

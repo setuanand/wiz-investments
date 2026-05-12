@@ -304,24 +304,121 @@
     requestAnimationFrame(step);
   }
 
-  async function fetchRealData() {
-    // Fetch 2 years of SPY daily closes via Yahoo Finance public API
+  async function fetchRealData(symbol = 'SPY', days = 252) {
+    // Fetch via server-side proxy — no CORS issues
     const notice = el('real-data-notice');
-    notice.textContent = '⏳ Fetching SPY data...';
+    notice.textContent = `⏳ Fetching ${symbol} data from server...`;
     notice.style.display = 'block';
+    notice.style.color = '';
     try {
-      const end = Math.floor(Date.now() / 1000);
-      const start = end - 2 * 365 * 24 * 3600;
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&period1=${start}&period2=${end}`;
-      const resp = await fetch(url);
+      const nonces = window.wizNonces || {};
+      const body = new FormData();
+      body.append('action', 'wiz_fetch_historical');
+      body.append('nonce', nonces.data || '');
+      body.append('symbol', symbol);
+      body.append('days', days);
+      const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
       const json = await resp.json();
-      const closes = json.result[0].indicators.quote[0].close.filter(v => v !== null);
-      notice.textContent = `✅ Loaded ${closes.length} days of real SPY data`;
+      if (!json.success) throw new Error(json.data?.message || 'Server error');
+      const closes = json.data.prices.map(p => p.close);
+      notice.textContent = `✅ Loaded ${closes.length} days of real ${symbol} data`;
+      notice.style.color = 'var(--gain)';
       return closes;
     } catch (e) {
-      notice.textContent = '❌ Could not fetch real data. Using simulation instead.';
+      notice.textContent = `❌ ${e.message}. Using simulation instead.`;
       notice.style.color = 'var(--loss)';
       return null;
+    }
+  }
+
+  async function fetchLivePriceServer(ticker) {
+    const nonces = window.wizNonces || {};
+    const body = new FormData();
+    body.append('action', 'wiz_fetch_live_price');
+    body.append('nonce', nonces.data || '');
+    body.append('symbol', ticker);
+    const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
+    const json = await resp.json();
+    if (!json.success) throw new Error(json.data?.message || 'Could not fetch price');
+    return json.data;
+  }
+
+  async function loadHoldingsFromServer() {
+    const nonces = window.wizNonces || {};
+    const body = new FormData();
+    body.append('action', 'wiz_get_holdings');
+    body.append('nonce', nonces.portfolio || '');
+    const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
+    const json = await resp.json();
+    if (json.success) {
+      holdings = json.data.holdings || [];
+      renderHoldingsTable();
+      if (json.data.summary) updatePortfolioSummaryFromServer(json.data.summary);
+    }
+  }
+
+  async function addHoldingToServer(holding) {
+    const nonces = window.wizNonces || {};
+    const body = new FormData();
+    body.append('action', 'wiz_add_holding');
+    body.append('nonce', nonces.portfolio || '');
+    Object.entries(holding).forEach(([k, v]) => body.append(k, v));
+    const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
+    const json = await resp.json();
+    if (json.success) {
+      holdings = json.data.holdings || [];
+      renderHoldingsTable();
+    } else {
+      alert(json.data?.message || 'Error saving holding.');
+    }
+  }
+
+  async function deleteHoldingFromServer(index) {
+    const nonces = window.wizNonces || {};
+    const body = new FormData();
+    body.append('action', 'wiz_delete_holding');
+    body.append('nonce', nonces.portfolio || '');
+    body.append('index', index);
+    const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
+    const json = await resp.json();
+    if (json.success) {
+      holdings = json.data.holdings || [];
+      renderHoldingsTable();
+    }
+  }
+
+  async function refreshAllPrices() {
+    const nonces = window.wizNonces || {};
+    const btn = el('refresh-prices-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Refreshing...'; }
+    const body = new FormData();
+    body.append('action', 'wiz_refresh_prices');
+    body.append('nonce', nonces.portfolio || '');
+    try {
+      const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
+      const json = await resp.json();
+      if (json.success) {
+        holdings = json.data.holdings || [];
+        renderHoldingsTable();
+        alert(json.data.message);
+      } else {
+        alert(json.data?.message || 'Error refreshing prices.');
+      }
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh All Prices'; }
+    }
+  }
+
+  async function loadSnapshotsFromServer(period = 'ALL') {
+    const nonces = window.wizNonces || {};
+    const body = new FormData();
+    body.append('action', 'wiz_get_snapshots');
+    body.append('nonce', nonces.portfolio || '');
+    body.append('period', period);
+    const resp = await fetch(nonces.ajaxUrl || '/wp-admin/admin-ajax.php', { method: 'POST', body });
+    const json = await resp.json();
+    if (json.success && json.data.snapshots.length > 0) {
+      buildPortfolioChartFromSnapshots(json.data.snapshots);
     }
   }
 
@@ -331,7 +428,7 @@
   let allocationChartInstance = null;
   let editingIndex = -1;
 
-  function saveHoldings() { localStorage.setItem('wiz_holdings', JSON.stringify(holdings)); }
+  function saveHoldings() { localStorage.setItem('wiz_holdings', JSON.stringify(holdings)); } // localStorage as cache
 
   function renderHoldingsTable() {
     const wrap = el('holdings-table-wrap'); if (!wrap) return;
@@ -412,6 +509,39 @@
     });
   }
 
+
+  function buildPortfolioChartFromSnapshots(snapshots) {
+    if (!snapshots || !snapshots.length) return;
+    const labels = snapshots.map(s => s.date);
+    const values = snapshots.map(s => s.value);
+    const isUp = values[values.length - 1] >= values[0];
+    const color = isUp ? DARK.green : DARK.red;
+    const ctx = el('portfolioChart'); if (!ctx) return;
+    if (portfolioChartInstance) {
+      portfolioChartInstance.data.labels = labels;
+      portfolioChartInstance.data.datasets[0].data = values;
+      portfolioChartInstance.data.datasets[0].borderColor = color;
+      portfolioChartInstance.data.datasets[0].backgroundColor = isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)';
+      portfolioChartInstance.update();
+      return;
+    }
+    portfolioChartInstance = new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets: [{ label: 'Portfolio Value', data: values, borderColor: color, backgroundColor: isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 0 }] },
+      options: chartDefaults({ scales: { y: { grid: { color: DARK.border }, ticks: { color: DARK.muted, callback: v => '$' + fmt(v, 0) } }, x: { grid: { color: DARK.border }, ticks: { color: DARK.muted, maxTicksLimit: 6 } } } })
+    });
+  }
+
+  function updatePortfolioSummaryFromServer(summary) {
+    const setEl = (id, text, cls) => { const e = el(id); if (e) { e.textContent = text; if (cls !== undefined) e.className = 'ps-value ' + cls; } };
+    setEl('pt-total-value', '$' + fmt(summary.total_value));
+    setEl('pt-total-cost',  '$' + fmt(summary.total_cost));
+    setEl('pt-total-pnl',   fmtDollar(summary.total_pnl), summary.total_pnl >= 0 ? 'gain' : 'loss');
+    setEl('pt-total-pct',   fmtPct(summary.total_pct),    summary.total_pct >= 0 ? 'gain' : 'loss');
+    if (summary.best)  setEl('pt-best',  summary.best.name  + ' (' + fmtPct(summary.best.pct)  + ')', 'gain');
+    if (summary.worst) setEl('pt-worst', summary.worst.name + ' (' + fmtPct(summary.worst.pct) + ')', 'loss');
+  }
+
   function updatePortfolioChart() {
     // Simulate portfolio value over time based on purchase dates and current prices
     const ctx = el('portfolioChart'); if (!ctx || !holdings.length) return;
@@ -458,23 +588,21 @@
   }
 
   window.wizDeleteHolding = function (i) {
-    holdings.splice(i, 1); saveHoldings(); renderHoldingsTable();
+    deleteHoldingFromServer(i);
   };
 
   async function fetchLivePrice(ticker) {
     const status = el('fetch-price-status');
     if (!ticker) { status.textContent = 'Enter a ticker symbol first (e.g. AAPL, BTC-USD)'; return; }
     status.textContent = '⏳ Fetching live price for ' + ticker + '...';
+    status.style.color = '';
     try {
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-      const resp = await fetch(url);
-      const json = await resp.json();
-      const price = json.result[0].meta.regularMarketPrice;
-      el('h-current-price').value = price.toFixed(2);
-      status.textContent = `✅ Live price: $${price.toFixed(2)}`;
+      const data = await fetchLivePriceServer(ticker);
+      el('h-current-price').value = data.price.toFixed(2);
+      status.textContent = `✅ Live price: $${data.price.toFixed(2)} (${data.change_pct >= 0 ? '+' : ''}${data.change_pct}% today)`;
       status.style.color = 'var(--gain)';
-    } catch {
-      status.textContent = '❌ Could not fetch price. Enter manually.';
+    } catch(e) {
+      status.textContent = `❌ ${e.message}. Enter price manually.`;
       status.style.color = 'var(--loss)';
     }
   }
@@ -608,7 +736,7 @@
       btn.addEventListener('click', function () {
         document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-        updatePortfolioChart();
+        loadSnapshotsFromServer(this.dataset.period);
       });
     });
   }
@@ -654,8 +782,8 @@
       notice.style.display = this.checked ? 'block' : 'none';
     });
 
-    // Portfolio Tracker
-    renderHoldingsTable();
+    // Portfolio Tracker — load from server
+    loadHoldingsFromServer();
 
     const addBtn = el('add-holding-btn');
     if (addBtn) addBtn.addEventListener('click', () => {
@@ -674,16 +802,18 @@
       const name = el('h-name').value.trim();
       const ticker = el('h-ticker').value.trim().toUpperCase();
       const units = parseFloat(el('h-units').value);
-      const buyPrice = parseFloat(el('h-buy-price').value);
-      const currentPrice = parseFloat(el('h-current-price').value);
+      const buy_price = parseFloat(el('h-buy-price').value);
+      const current_price = parseFloat(el('h-current-price').value);
       const date = el('h-date').value;
-      if (!name || !units || !buyPrice || !currentPrice) { alert('Please fill in all required fields.'); return; }
-      holdings.push({ name, ticker, units, buyPrice, currentPrice, date });
-      saveHoldings();
-      renderHoldingsTable();
+      if (!name || !units || !buy_price || !current_price) { alert('Please fill in all required fields.'); return; }
+      addHoldingToServer({ name, ticker, units, buy_price, current_price, date });
       el('add-holding-form').style.display = 'none';
       ['h-name','h-ticker','h-units','h-buy-price','h-current-price'].forEach(id => { const e = el(id); if (e) e.value = ''; });
     });
+
+    // Refresh All Prices button
+    const refreshBtn = el('refresh-prices-btn');
+    if (refreshBtn) refreshBtn.addEventListener('click', refreshAllPrices);
 
     // Portfolio Optimizer
     renderOptimizerAssets();

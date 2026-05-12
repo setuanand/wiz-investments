@@ -236,6 +236,7 @@ $display = $user->display_name ?: $user->user_email;
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-lg);">
             <h3 class="card-section-title">Holdings</h3>
             <button id="add-holding-btn" class="btn btn-primary btn-sm">+ Add Holding</button>
+            <button id="refresh-prices-btn" class="btn btn-secondary btn-sm" style="margin-left:0.5rem;">🔄 Refresh All Prices</button>
           </div>
 
           <!-- Add Holding Form -->
