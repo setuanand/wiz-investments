@@ -471,16 +471,24 @@ add_action('admin_head', 'wiz_add_favicon');
 
 // Localize nonces for JS
 function wiz_localize_nonces() {
-    // wiz-analytics is only enqueued on analytics page — use inline script as fallback
     $nonce_data = array(
         'data'      => wp_create_nonce('wiz_data_nonce'),
         'portfolio' => wp_create_nonce('wiz_portfolio_nonce'),
         'ajaxUrl'   => admin_url('admin-ajax.php'),
     );
-    // Try wp_localize_script first (works if script is enqueued)
     wp_localize_script('wiz-analytics', 'wizNonces', $nonce_data);
-    // Also output inline script as fallback so wizNonces is always available
-    $json = wp_json_encode($nonce_data);
-    echo "<script>window.wizNonces = {$json};</script>";
 }
 add_action('wp_enqueue_scripts', 'wiz_localize_nonces', 20);
+
+// Output wizNonces inline in wp_head so it is always available regardless of script enqueue
+function wiz_inline_nonces() {
+    $nonce_data = array(
+        'data'      => wp_create_nonce('wiz_data_nonce'),
+        'portfolio' => wp_create_nonce('wiz_portfolio_nonce'),
+        'ajaxUrl'   => admin_url('admin-ajax.php'),
+    );
+    $json = wp_json_encode($nonce_data);
+    echo "<script>window.wizNonces = {$json};</script>
+";
+}
+add_action('wp_head', 'wiz_inline_nonces');
