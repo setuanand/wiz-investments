@@ -471,20 +471,22 @@
     }
     let totalCost = 0, totalVal = 0;
     let h = `<table class="analytics-table"><thead><tr><th>Asset</th><th>Ticker</th><th>Units</th><th>Buy $</th><th>Current $</th><th>Cost</th><th>Value</th><th>P&L</th><th>Return</th><th>Weight</th><th></th></tr></thead><tbody>`;
-    const values = holdings.map(hh => hh.units * hh.currentPrice);
-    const costs = holdings.map(hh => hh.units * hh.buyPrice);
+    const values = holdings.map(hh => hh.units * (hh.current_price || hh.currentPrice || 0));
+    const costs = holdings.map(hh => hh.units * (hh.buy_price || hh.buyPrice || 0));
     const totalV = values.reduce((s, v) => s + v, 0);
     holdings.forEach((hh, i) => {
       const cost = costs[i], val = values[i], pnl = val - cost, ret = (pnl / cost * 100);
       totalCost += cost; totalVal += val;
       const cls = pnl >= 0 ? 'gain' : 'loss';
       const weight = totalV ? (val / totalV * 100).toFixed(1) : 0;
+      const buyPrice = hh.buy_price || hh.buyPrice || 0;
+      const currentPrice = hh.current_price || hh.currentPrice || 0;
       h += `<tr>
         <td><strong>${hh.name}</strong></td>
         <td>${hh.ticker || '—'}</td>
         <td>${hh.units}</td>
-        <td>$${fmt(hh.buyPrice)}</td>
-        <td>$${fmt(hh.currentPrice)}</td>
+        <td>$${fmt(buyPrice)}</td>
+        <td>$${fmt(currentPrice)}</td>
         <td>$${fmt(cost)}</td>
         <td>$${fmt(val)}</td>
         <td class="${cls}">${fmtDollar(pnl)}</td>
@@ -524,7 +526,7 @@
   function updateAllocationChart() {
     const ctx = el('allocationChart'); if (!ctx) return;
     const labels = holdings.map(h => h.name);
-    const data = holdings.map(h => +(h.units * h.currentPrice).toFixed(2));
+    const data = holdings.map(h => +((h.units * (h.current_price || h.currentPrice || 0))).toFixed(2));
     const colors = ['#2962ff','#26a69a','#f0b90b','#ef5350','#ab47bc','#ff7043','#42a5f5','#66bb6a'];
 
     if (allocationChartInstance) {
@@ -594,7 +596,7 @@
           const totalDays = Math.max(1, (today - purchaseDate) / 86400000);
           const elapsed = Math.max(0, (d - purchaseDate) / 86400000);
           const progress = Math.min(1, elapsed / totalDays);
-          const interpolatedPrice = h.buyPrice + (h.currentPrice - h.buyPrice) * progress;
+          const bp = h.buy_price || h.buyPrice || 0; const cp = h.current_price || h.currentPrice || 0; const interpolatedPrice = bp + (cp - bp) * progress;
           val += h.units * interpolatedPrice;
         }
       });
