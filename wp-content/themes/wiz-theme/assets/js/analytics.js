@@ -256,6 +256,8 @@
     renderTradeTable(sim.trades);
 
     lastSimData = { prices, sim, benchmark };
+    // Store globally for tab switch re-render
+    window._wizLastSimData = lastSimData;
 
     el('download-csv').onclick = () => {
       const rows = [['Day', 'Price', 'Strategy Equity', 'BuyHold Equity', 'Signal']];
@@ -781,20 +783,34 @@
     if (btn) btn.classList.add('active');
     if (content) content.classList.add('active');
     localStorage.setItem('wiz_active_tab', tabName);
-    // If switching to portfolio, trigger chart resize so canvas renders correctly
-    if (tabName === 'portfolio') {
-      setTimeout(() => {
-        if (portfolioChartInstance) portfolioChartInstance.resize();
-        if (allocationChartInstance) allocationChartInstance.resize();
-        // Load snapshots if chart is empty
+
+    // After tab is visible, destroy and re-render charts so they get correct canvas dimensions
+    setTimeout(() => {
+      if (tabName === 'simulator') {
+        // Re-render simulator charts if they exist
+        if (lastSimData) {
+          if (priceChart) { priceChart.destroy(); priceChart = null; }
+          if (equityChart) { equityChart.destroy(); equityChart = null; }
+          buildPriceChart(lastSimData.prices, lastSimData.sim.signals);
+          buildEquityChart(lastSimData.sim.equity, lastSimData.benchmark);
+        } else {
+          const prices = gbm(100, Number(el('sim-days')?.value)||252,
+            Number(el('drift')?.value)||0.10, Number(el('volatility')?.value)||0.18);
+          runSimulation(prices);
+        }
+      }
+      if (tabName === 'portfolio') {
+        // Resize existing charts — canvas is now visible so dimensions are correct
+        if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
+        if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
         const activePeriod = document.querySelector('.period-btn.active')?.dataset.period || '1M';
         loadSnapshotsFromServer(activePeriod);
-      }, 50);
-    }
-    if (tabName === 'livechart') {
-      // TradingView chart may need resize after tab show
-      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
-    }
+        if (holdings.length > 0) updateAllocationChart();
+      }
+      if (tabName === 'livechart') {
+        window.dispatchEvent(new Event('resize'));
+      }
+    }, 80);
   }
 
   function initTabs() {
@@ -842,7 +858,6 @@
   (function restoreTabEarly() {
     const savedTab = localStorage.getItem('wiz_active_tab');
     if (savedTab && savedTab !== 'simulator') {
-      // Hide simulator, show saved tab without animation
       const allContents = document.querySelectorAll('.analytics-tab-content');
       const allBtns = document.querySelectorAll('.analytics-tab');
       allContents.forEach(c => c.classList.remove('active'));
@@ -858,12 +873,13 @@
     initTabs();
     initTooltips();
 
-    // Only run initial simulation if simulator tab is active
     const activeTab = localStorage.getItem('wiz_active_tab') || 'simulator';
     if (activeTab === 'simulator') {
+      // Canvas is visible — render immediately
       const prices = gbm(100, 252, 0.10, 0.18);
       runSimulation(prices);
     }
+    // For non-simulator tabs, charts will be rendered by switchTab after holdings/data load
 
     // Run button
     const runBtn = el('run-sim');
