@@ -764,14 +764,34 @@
   }
 
   // ─── TABS ──────────────────────────────────────────────────
+  function switchTab(tabName) {
+    document.querySelectorAll('.analytics-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.analytics-tab-content').forEach(c => c.classList.remove('active'));
+    const btn = document.querySelector(`.analytics-tab[data-tab="${tabName}"]`);
+    const content = el('tab-' + tabName);
+    if (btn) btn.classList.add('active');
+    if (content) content.classList.add('active');
+    localStorage.setItem('wiz_active_tab', tabName);
+    // If switching to portfolio, trigger chart resize so canvas renders correctly
+    if (tabName === 'portfolio') {
+      setTimeout(() => {
+        if (portfolioChartInstance) portfolioChartInstance.resize();
+        if (allocationChartInstance) allocationChartInstance.resize();
+        // Load snapshots if chart is empty
+        const activePeriod = document.querySelector('.period-btn.active')?.dataset.period || '1M';
+        loadSnapshotsFromServer(activePeriod);
+      }, 50);
+    }
+    if (tabName === 'livechart') {
+      // TradingView chart may need resize after tab show
+      setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
+    }
+  }
+
   function initTabs() {
     document.querySelectorAll('.analytics-tab').forEach(tab => {
       tab.addEventListener('click', function () {
-        document.querySelectorAll('.analytics-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.analytics-tab-content').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        const content = el('tab-' + this.dataset.tab);
-        if (content) content.classList.add('active');
+        switchTab(this.dataset.tab);
       });
     });
 
@@ -782,6 +802,13 @@
         this.classList.add('active');
         const content = el('subtab-' + this.dataset.subtab);
         if (content) content.classList.add('active');
+        localStorage.setItem('wiz_active_subtab', this.dataset.subtab);
+        // Resize charts when switching subtabs
+        setTimeout(() => {
+          if (portfolioChartInstance) portfolioChartInstance.resize();
+          if (allocationChartInstance) allocationChartInstance.resize();
+          if (frontierChart) frontierChart.resize();
+        }, 50);
       });
     });
 
@@ -792,6 +819,21 @@
         loadSnapshotsFromServer(this.dataset.period);
       });
     });
+
+    // Restore saved tab state
+    const savedTab = localStorage.getItem('wiz_active_tab') || 'simulator';
+    const savedSubtab = localStorage.getItem('wiz_active_subtab') || 'tracker';
+
+    // Restore main tab
+    if (savedTab !== 'simulator') {
+      switchTab(savedTab);
+    }
+
+    // Restore sub-tab
+    if (savedSubtab !== 'tracker') {
+      const subtabBtn = document.querySelector(`.portfolio-subtab[data-subtab="${savedSubtab}"]`);
+      if (subtabBtn) subtabBtn.click();
+    }
   }
 
   // ─── INIT ──────────────────────────────────────────────────
