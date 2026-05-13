@@ -181,7 +181,7 @@
       { label: 'Sell', data: sellPoints, borderColor: DARK.red, backgroundColor: DARK.red, pointRadius: 6, pointStyle: 'triangle', rotation: 180, showLine: false },
     ];
 
-    if (priceChart) { priceChart.data.labels = labels; priceChart.data.datasets = datasets; priceChart.update(); return; }
+    if (priceChart) { priceChart.destroy(); priceChart = null; }
     const ctx = el('priceChart');
     if (!ctx) return;
     priceChart = new Chart(ctx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults({ plugins: { legend: { labels: { color: DARK.text, filter: i => i.text !== 'Buy' && i.text !== 'Sell' } } } }) });
@@ -193,7 +193,7 @@
       { label: 'Strategy', data: equity.map(v => +v.toFixed(2)), borderColor: DARK.green, backgroundColor: 'rgba(38,166,154,0.1)', borderWidth: 2, fill: true, tension: 0.2, pointRadius: 0 },
       { label: 'Buy & Hold', data: benchmark.map(v => +v.toFixed(2)), borderColor: DARK.gold, backgroundColor: 'rgba(240,185,11,0.05)', borderWidth: 1.5, borderDash: [5, 3], fill: false, tension: 0.2, pointRadius: 0 },
     ];
-    if (equityChart) { equityChart.data.labels = labels; equityChart.data.datasets = datasets; equityChart.update(); return; }
+    if (equityChart) { equityChart.destroy(); equityChart = null; }
     const ctx = el('equityChart');
     if (!ctx) return;
     equityChart = new Chart(ctx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults() });
@@ -398,10 +398,15 @@
       holdings = serverHoldings;
       renderHoldingsTable();
       if (json.data.summary) updatePortfolioSummaryFromServer(json.data.summary);
-      // Always load snapshots after holdings — uses active period button
-      const activePeriod = document.querySelector('.period-btn.active')?.dataset.period || '1M';
       if (serverHoldings.length > 0) {
+        // Use saved period selection
+        const activePeriod = document.querySelector('.period-btn.active')?.dataset.period
+                          || localStorage.getItem('wiz_active_period') || '1M';
+        // Destroy charts first so they re-render with correct dimensions
+        if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
+        if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
         loadSnapshotsFromServer(activePeriod);
+        updateAllocationChart();
       }
     }
   }
@@ -581,14 +586,8 @@
     const isUp = values[values.length - 1] >= values[0];
     const color = isUp ? DARK.green : DARK.red;
     const ctx = el('portfolioChart'); if (!ctx) return;
-    if (portfolioChartInstance) {
-      portfolioChartInstance.data.labels = labels;
-      portfolioChartInstance.data.datasets[0].data = values;
-      portfolioChartInstance.data.datasets[0].borderColor = color;
-      portfolioChartInstance.data.datasets[0].backgroundColor = isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)';
-      portfolioChartInstance.update();
-      return;
-    }
+    // Always destroy and recreate to ensure correct canvas dimensions
+    if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
     portfolioChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'line',
       data: { labels, datasets: [{ label: 'Portfolio Value', data: values, borderColor: color, backgroundColor: isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 0 }] },
@@ -800,10 +799,11 @@
         }
       }
       if (tabName === 'portfolio') {
-        // Resize existing charts — canvas is now visible so dimensions are correct
         if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
         if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
-        const activePeriod = document.querySelector('.period-btn.active')?.dataset.period || '1M';
+        // Use saved period (restored from localStorage)
+        const activePeriod = document.querySelector('.period-btn.active')?.dataset.period
+                          || localStorage.getItem('wiz_active_period') || '1M';
         loadSnapshotsFromServer(activePeriod);
         if (holdings.length > 0) updateAllocationChart();
       }
@@ -837,10 +837,17 @@
       });
     });
 
+    // Restore saved period before attaching listeners
+    const savedPeriod = localStorage.getItem('wiz_active_period') || '1M';
     document.querySelectorAll('.period-btn').forEach(btn => {
+      if (btn.dataset.period === savedPeriod) {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
       btn.addEventListener('click', function () {
         document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
+        localStorage.setItem('wiz_active_period', this.dataset.period);
         loadSnapshotsFromServer(this.dataset.period);
       });
     });
