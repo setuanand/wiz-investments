@@ -492,3 +492,15 @@ function wiz_inline_nonces() {
 ";
 }
 add_action('wp_head', 'wiz_inline_nonces');
+
+// ===================== LOGOUT =====================
+// Bypass WordPress logout confirmation page — log out directly
+add_action('check_admin_referer', 'wiz_bypass_logout_confirmation', 10, 2);
+function wiz_bypass_logout_confirmation($action, $result) {
+    if ($action === 'log-out' && !isset($_GET['_wpnonce'])) {
+        $redirect = isset($_GET['redirect_to']) ? $_GET['redirect_to'] : home_url();
+        $logout_url = wp_logout_url($redirect);
+        wp_redirect($logout_url);
+        exit;
+    }
+}

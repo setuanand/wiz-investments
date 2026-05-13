@@ -396,11 +396,16 @@
       holdings = serverHoldings;
       renderHoldingsTable();
       if (json.data.summary) updatePortfolioSummaryFromServer(json.data.summary);
-      if (serverHoldings.length > 0) loadSnapshotsFromServer('1M');
+      // Always load snapshots after holdings — uses active period button
+      const activePeriod = document.querySelector('.period-btn.active')?.dataset.period || '1M';
+      if (serverHoldings.length > 0) {
+        loadSnapshotsFromServer(activePeriod);
+      }
     }
   }
 
   async function addHoldingToServer(holding) {
+    await waitForNonces();
     const nonces = window.wizNonces || {};
     const body = new FormData();
     body.append('action', 'wiz_add_holding');
@@ -411,6 +416,9 @@
     if (json.success) {
       holdings = json.data.holdings || [];
       renderHoldingsTable();
+      if (json.data.summary) updatePortfolioSummaryFromServer(json.data.summary);
+      const activePeriod = document.querySelector('.period-btn.active')?.dataset.period || '1M';
+      loadSnapshotsFromServer(activePeriod);
     } else {
       alert(json.data?.message || 'Error saving holding.');
     }
