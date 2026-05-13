@@ -2189,3 +2189,11 @@ select.form-control {
   .holding-form-grid { grid-template-columns: 1fr 1fr; }
   .optimizer-assets-grid { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+/* Prevent tab flash on page load */
+.analytics-tab-content {
+  display: none;
+}
+.analytics-tab-content.active {
+  display: block;
+}

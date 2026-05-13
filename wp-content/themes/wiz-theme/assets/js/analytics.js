@@ -441,7 +441,12 @@
   async function refreshAllPrices() {
     const nonces = window.wizNonces || {};
     const btn = el('refresh-prices-btn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Refreshing...'; }
+    if (btn) {
+      // Lock button width before changing text to prevent layout shift
+      btn.style.minWidth = btn.offsetWidth + 'px';
+      btn.disabled = true;
+      btn.textContent = '⏳ Refreshing...';
+    }
     const body = new FormData();
     body.append('action', 'wiz_refresh_prices');
     body.append('nonce', nonces.portfolio || '');
@@ -456,7 +461,11 @@
         alert(json.data?.message || 'Error refreshing prices.');
       }
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh All Prices'; }
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🔄 Refresh All Prices';
+        btn.style.minWidth = ''; // release fixed width
+      }
     }
   }
 
@@ -820,16 +829,8 @@
       });
     });
 
-    // Restore saved tab state
-    const savedTab = localStorage.getItem('wiz_active_tab') || 'simulator';
+    // Restore sub-tab state
     const savedSubtab = localStorage.getItem('wiz_active_subtab') || 'tracker';
-
-    // Restore main tab
-    if (savedTab !== 'simulator') {
-      switchTab(savedTab);
-    }
-
-    // Restore sub-tab
     if (savedSubtab !== 'tracker') {
       const subtabBtn = document.querySelector(`.portfolio-subtab[data-subtab="${savedSubtab}"]`);
       if (subtabBtn) subtabBtn.click();
@@ -837,13 +838,32 @@
   }
 
   // ─── INIT ──────────────────────────────────────────────────
+  // Restore tab state IMMEDIATELY before paint to prevent flash
+  (function restoreTabEarly() {
+    const savedTab = localStorage.getItem('wiz_active_tab');
+    if (savedTab && savedTab !== 'simulator') {
+      // Hide simulator, show saved tab without animation
+      const allContents = document.querySelectorAll('.analytics-tab-content');
+      const allBtns = document.querySelectorAll('.analytics-tab');
+      allContents.forEach(c => c.classList.remove('active'));
+      allBtns.forEach(b => b.classList.remove('active'));
+      const content = document.getElementById('tab-' + savedTab);
+      const btn = document.querySelector(`.analytics-tab[data-tab="${savedTab}"]`);
+      if (content) content.classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+  })();
+
   document.addEventListener('DOMContentLoaded', function () {
     initTabs();
     initTooltips();
 
-    // Initial simulation
-    const prices = gbm(100, 252, 0.10, 0.18);
-    runSimulation(prices);
+    // Only run initial simulation if simulator tab is active
+    const activeTab = localStorage.getItem('wiz_active_tab') || 'simulator';
+    if (activeTab === 'simulator') {
+      const prices = gbm(100, 252, 0.10, 0.18);
+      runSimulation(prices);
+    }
 
     // Run button
     const runBtn = el('run-sim');
