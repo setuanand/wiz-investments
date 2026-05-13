@@ -311,6 +311,7 @@
     notice.style.display = 'block';
     notice.style.color = '';
     try {
+      await waitForNonces();
       const nonces = window.wizNonces || {};
       const body = new FormData();
       body.append('action', 'wiz_fetch_historical');
@@ -343,7 +344,17 @@
     return json.data;
   }
 
+  async function waitForNonces(maxWait = 3000) {
+    const start = Date.now();
+    while (!window.wizNonces?.portfolio) {
+      if (Date.now() - start > maxWait) return false;
+      await new Promise(r => setTimeout(r, 50));
+    }
+    return true;
+  }
+
   async function loadHoldingsFromServer() {
+    await waitForNonces();
     const nonces = window.wizNonces || {};
     const body = new FormData();
     body.append('action', 'wiz_get_holdings');
@@ -809,12 +820,21 @@
       animate(prices);
     });
 
-    // Real data toggle
+    // Real data toggle — restore saved preference
     const realToggle = el('use-real-data');
-    if (realToggle) realToggle.addEventListener('change', function () {
-      const notice = el('real-data-notice');
-      notice.style.display = this.checked ? 'block' : 'none';
-    });
+    if (realToggle) {
+      // Restore saved state
+      if (localStorage.getItem('wiz_real_data') === 'true') {
+        realToggle.checked = true;
+        const notice = el('real-data-notice');
+        if (notice) notice.style.display = 'block';
+      }
+      realToggle.addEventListener('change', function () {
+        const notice = el('real-data-notice');
+        if (notice) notice.style.display = this.checked ? 'block' : 'none';
+        localStorage.setItem('wiz_real_data', this.checked);
+      });
+    }
 
     // Portfolio Tracker — load from server
     loadHoldingsFromServer();
