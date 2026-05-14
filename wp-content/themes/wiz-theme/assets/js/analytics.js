@@ -407,12 +407,8 @@
       renderHoldingsTable();
       if (json.data.summary) updatePortfolioSummaryFromServer(json.data.summary);
       if (serverHoldings.length > 0) {
-        // Use saved period selection
         const activePeriod = document.querySelector('.period-btn.active')?.dataset.period
                           || localStorage.getItem('wiz_active_period') || '1M';
-        // Destroy charts first so they re-render with correct dimensions
-        if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
-        if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
         loadSnapshotsFromServer(activePeriod);
         updateAllocationChart();
       }
@@ -575,7 +571,14 @@
     const labels = holdings.map(h => h.name);
     const data = holdings.map(h => +((h.units * (h.current_price || h.currentPrice || 0))).toFixed(2));
     const colors = ['#2962ff','#26a69a','#f0b90b','#ef5350','#ab47bc','#ff7043','#42a5f5','#66bb6a'];
-    if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
+    // Update existing chart instead of destroying
+    if (allocationChartInstance) {
+      allocationChartInstance.data.labels = labels;
+      allocationChartInstance.data.datasets[0].data = data;
+      allocationChartInstance.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
+      allocationChartInstance.update('none');
+      return;
+    }
     allocationChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors.slice(0, labels.length), borderColor: DARK.bg, borderWidth: 3 }] },
@@ -597,7 +600,16 @@
     const values = snapshots.map(s => s.value);
     const isUp = values[values.length - 1] >= values[0];
     const color = isUp ? DARK.green : DARK.red;
-    if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
+
+    // If chart already exists with valid data, just update — no destroy
+    if (portfolioChartInstance) {
+      portfolioChartInstance.data.labels = labels;
+      portfolioChartInstance.data.datasets[0].data = values;
+      portfolioChartInstance.data.datasets[0].borderColor = color;
+      portfolioChartInstance.data.datasets[0].backgroundColor = isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)';
+      portfolioChartInstance.update('none'); // 'none' = no animation on update
+      return;
+    }
     portfolioChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'line',
       data: { labels, datasets: [{ label: 'Portfolio Value', data: values, borderColor: color, backgroundColor: isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 0 }] },
@@ -796,22 +808,32 @@
     // After tab is visible, destroy and re-render charts so they get correct canvas dimensions
     setTimeout(() => {
       if (tabName === 'simulator') {
-        // Re-render simulator charts if they exist
-        if (lastSimData) {
+        const pCtx = el('priceChart');
+        const eCtx = el('equityChart');
+        const needsRender = (pCtx && pCtx.offsetWidth === 0) || !priceChart;
+        if (needsRender) {
           if (priceChart) { priceChart.destroy(); priceChart = null; }
           if (equityChart) { equityChart.destroy(); equityChart = null; }
-          buildPriceChart(lastSimData.prices, lastSimData.sim.signals);
-          buildEquityChart(lastSimData.sim.equity, lastSimData.benchmark);
-        } else {
-          const prices = gbm(100, Number(el('sim-days')?.value)||252,
-            Number(el('drift')?.value)||0.10, Number(el('volatility')?.value)||0.18);
-          runSimulation(prices);
+          if (lastSimData) {
+            buildPriceChart(lastSimData.prices, lastSimData.sim.signals);
+            buildEquityChart(lastSimData.sim.equity, lastSimData.benchmark);
+          } else {
+            const prices = gbm(100, Number(el('sim-days')?.value)||252,
+              Number(el('drift')?.value)||0.10, Number(el('volatility')?.value)||0.18);
+            runSimulation(prices);
+          }
         }
       }
       if (tabName === 'portfolio') {
-        if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
-        if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
-        // Use saved period (restored from localStorage)
+        // Destroy only if canvas had wrong dimensions (was hidden) — force re-render
+        const pCtx = el('portfolioChart');
+        const aCtx = el('allocationChart');
+        if (pCtx && pCtx.offsetWidth === 0 && portfolioChartInstance) {
+          portfolioChartInstance.destroy(); portfolioChartInstance = null;
+        }
+        if (aCtx && aCtx.offsetWidth === 0 && allocationChartInstance) {
+          allocationChartInstance.destroy(); allocationChartInstance = null;
+        }
         const activePeriod = document.querySelector('.period-btn.active')?.dataset.period
                           || localStorage.getItem('wiz_active_period') || '1M';
         loadSnapshotsFromServer(activePeriod);
