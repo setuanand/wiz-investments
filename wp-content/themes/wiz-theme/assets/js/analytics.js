@@ -170,7 +170,12 @@
   // ─── CHARTS ────────────────────────────────────────────────
   let priceChart = null, equityChart = null, portfolioChart = null, allocationChart = null, frontierChart = null;
 
-  function buildPriceChart(prices, signals) {
+  function buildPriceChart(prices, signals, attempt = 0) {
+    const ctx = el('priceChart');
+    if (ctx && ctx.offsetWidth === 0 && attempt < 20) {
+      setTimeout(() => buildPriceChart(prices, signals, attempt + 1), 80);
+      return;
+    }
     const labels = prices.map((_, i) => `Day ${i + 1}`);
     const buyPoints = prices.map((p, i) => signals[i] === 1 ? p : null);
     const sellPoints = prices.map((p, i) => signals[i] === -1 ? p : null);
@@ -182,21 +187,24 @@
     ];
 
     if (priceChart) { priceChart.destroy(); priceChart = null; }
-    const ctx = el('priceChart');
     if (!ctx) return;
     priceChart = new Chart(ctx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults({ plugins: { legend: { labels: { color: DARK.text, filter: i => i.text !== 'Buy' && i.text !== 'Sell' } } } }) });
   }
 
-  function buildEquityChart(equity, benchmark) {
+  function buildEquityChart(equity, benchmark, attempt = 0) {
+    const ectx = el('equityChart');
+    if (ectx && ectx.offsetWidth === 0 && attempt < 20) {
+      setTimeout(() => buildEquityChart(equity, benchmark, attempt + 1), 80);
+      return;
+    }
     const labels = equity.map((_, i) => `Day ${i + 1}`);
     const datasets = [
       { label: 'Strategy', data: equity.map(v => +v.toFixed(2)), borderColor: DARK.green, backgroundColor: 'rgba(38,166,154,0.1)', borderWidth: 2, fill: true, tension: 0.2, pointRadius: 0 },
       { label: 'Buy & Hold', data: benchmark.map(v => +v.toFixed(2)), borderColor: DARK.gold, backgroundColor: 'rgba(240,185,11,0.05)', borderWidth: 1.5, borderDash: [5, 3], fill: false, tension: 0.2, pointRadius: 0 },
     ];
     if (equityChart) { equityChart.destroy(); equityChart = null; }
-    const ctx = el('equityChart');
-    if (!ctx) return;
-    equityChart = new Chart(ctx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults() });
+    if (!ectx) return;
+    equityChart = new Chart(ectx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults() });
   }
 
   function updateMetrics(m) {
@@ -558,35 +566,37 @@
     }
   }
 
-  function updateAllocationChart() {
+  function updateAllocationChart(attempt = 0) {
     const ctx = el('allocationChart'); if (!ctx) return;
+    if ((ctx.offsetWidth === 0 || ctx.offsetHeight === 0) && attempt < 20) {
+      setTimeout(() => updateAllocationChart(attempt + 1), 80);
+      return;
+    }
     const labels = holdings.map(h => h.name);
     const data = holdings.map(h => +((h.units * (h.current_price || h.currentPrice || 0))).toFixed(2));
     const colors = ['#2962ff','#26a69a','#f0b90b','#ef5350','#ab47bc','#ff7043','#42a5f5','#66bb6a'];
-
-    if (allocationChartInstance) {
-      allocationChartInstance.data.labels = labels;
-      allocationChartInstance.data.datasets[0].data = data;
-      allocationChartInstance.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
-      allocationChartInstance.update();
-      return;
-    }
+    if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
     allocationChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors.slice(0, labels.length), borderColor: DARK.bg, borderWidth: 3 }] },
       options: { responsive: true, plugins: { legend: { position: 'right', labels: { color: DARK.text, padding: 16 } } } }
     });
   }
-
-
-  function buildPortfolioChartFromSnapshots(snapshots) {
+  function buildPortfolioChartFromSnapshots(snapshots, attempt = 0) {
     if (!snapshots || !snapshots.length) return;
+    const ctx = el('portfolioChart'); if (!ctx) return;
+
+    // Wait until canvas has real dimensions — tab must be visible
+    const w = ctx.offsetWidth, h = ctx.offsetHeight;
+    if ((w === 0 || h === 0) && attempt < 20) {
+      setTimeout(() => buildPortfolioChartFromSnapshots(snapshots, attempt + 1), 80);
+      return;
+    }
+
     const labels = snapshots.map(s => s.date);
     const values = snapshots.map(s => s.value);
     const isUp = values[values.length - 1] >= values[0];
     const color = isUp ? DARK.green : DARK.red;
-    const ctx = el('portfolioChart'); if (!ctx) return;
-    // Always destroy and recreate to ensure correct canvas dimensions
     if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
     portfolioChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'line',
