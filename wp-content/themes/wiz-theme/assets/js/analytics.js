@@ -170,10 +170,14 @@
   // ─── CHARTS ────────────────────────────────────────────────
   let priceChart = null, equityChart = null, portfolioChart = null, allocationChart = null, frontierChart = null;
 
-  function buildPriceChart(prices, signals, attempt = 0) {
-    const ctx = el('priceChart');
-    if (ctx && ctx.offsetWidth === 0 && attempt < 20) {
-      setTimeout(() => buildPriceChart(prices, signals, attempt + 1), 80);
+  function buildPriceChart(prices, signals) {
+    const ctx = el('priceChart'); if (!ctx) return;
+    if (ctx.offsetWidth === 0) {
+      if (window._priceObserver) window._priceObserver.disconnect();
+      window._priceObserver = new ResizeObserver((entries) => {
+        for (const e of entries) { if (e.contentRect.width > 0) { window._priceObserver.disconnect(); buildPriceChart(prices, signals); } }
+      });
+      window._priceObserver.observe(ctx);
       return;
     }
     const labels = prices.map((_, i) => `Day ${i + 1}`);
@@ -191,10 +195,14 @@
     priceChart = new Chart(ctx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults({ plugins: { legend: { labels: { color: DARK.text, filter: i => i.text !== 'Buy' && i.text !== 'Sell' } } } }) });
   }
 
-  function buildEquityChart(equity, benchmark, attempt = 0) {
-    const ectx = el('equityChart');
-    if (ectx && ectx.offsetWidth === 0 && attempt < 20) {
-      setTimeout(() => buildEquityChart(equity, benchmark, attempt + 1), 80);
+  function buildEquityChart(equity, benchmark) {
+    const ectx = el('equityChart'); if (!ectx) return;
+    if (ectx.offsetWidth === 0) {
+      if (window._equityObserver) window._equityObserver.disconnect();
+      window._equityObserver = new ResizeObserver((entries) => {
+        for (const e of entries) { if (e.contentRect.width > 0) { window._equityObserver.disconnect(); buildEquityChart(equity, benchmark); } }
+      });
+      window._equityObserver.observe(ectx);
       return;
     }
     const labels = equity.map((_, i) => `Day ${i + 1}`);
@@ -203,7 +211,6 @@
       { label: 'Buy & Hold', data: benchmark.map(v => +v.toFixed(2)), borderColor: DARK.gold, backgroundColor: 'rgba(240,185,11,0.05)', borderWidth: 1.5, borderDash: [5, 3], fill: false, tension: 0.2, pointRadius: 0 },
     ];
     if (equityChart) { equityChart.destroy(); equityChart = null; }
-    if (!ectx) return;
     equityChart = new Chart(ectx.getContext('2d'), { type: 'line', data: { labels, datasets }, options: chartDefaults() });
   }
 
@@ -562,16 +569,11 @@
     }
   }
 
-  function updateAllocationChart(attempt = 0) {
-    const ctx = el('allocationChart'); if (!ctx) return;
-    if ((ctx.offsetWidth === 0 || ctx.offsetHeight === 0) && attempt < 20) {
-      setTimeout(() => updateAllocationChart(attempt + 1), 80);
-      return;
-    }
+  function renderAllocationChart() {
+    const ctx = el('allocationChart'); if (!ctx || !holdings.length) return;
     const labels = holdings.map(h => h.name);
     const data = holdings.map(h => +((h.units * (h.current_price || h.currentPrice || 0))).toFixed(2));
     const colors = ['#2962ff','#26a69a','#f0b90b','#ef5350','#ab47bc','#ff7043','#42a5f5','#66bb6a'];
-    // Update existing chart instead of destroying
     if (allocationChartInstance) {
       allocationChartInstance.data.labels = labels;
       allocationChartInstance.data.datasets[0].data = data;
@@ -579,42 +581,76 @@
       allocationChartInstance.update('none');
       return;
     }
+    if (allocationChartInstance) { allocationChartInstance.destroy(); allocationChartInstance = null; }
     allocationChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors.slice(0, labels.length), borderColor: DARK.bg, borderWidth: 3 }] },
       options: { responsive: true, plugins: { legend: { position: 'right', labels: { color: DARK.text, padding: 16 } } } }
     });
   }
-  function buildPortfolioChartFromSnapshots(snapshots, attempt = 0) {
-    if (!snapshots || !snapshots.length) return;
-    const ctx = el('portfolioChart'); if (!ctx) return;
 
-    // Wait until canvas has real dimensions — tab must be visible
-    const w = ctx.offsetWidth, h = ctx.offsetHeight;
-    if ((w === 0 || h === 0) && attempt < 20) {
-      setTimeout(() => buildPortfolioChartFromSnapshots(snapshots, attempt + 1), 80);
+  function updateAllocationChart() {
+    const ctx = el('allocationChart'); if (!ctx) return;
+    if (ctx.offsetWidth > 0 && ctx.offsetHeight > 0) {
+      renderAllocationChart();
       return;
     }
+    if (window._allocObserver) window._allocObserver.disconnect();
+    window._allocObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          window._allocObserver.disconnect();
+          renderAllocationChart();
+        }
+      }
+    });
+    window._allocObserver.observe(ctx);
+  }
+  // Store pending snapshot data so ResizeObserver can render when canvas becomes visible
+  let _pendingSnapshots = null;
 
+  function renderPortfolioChart(snapshots) {
+    const ctx = el('portfolioChart'); if (!ctx) return;
     const labels = snapshots.map(s => s.date);
     const values = snapshots.map(s => s.value);
     const isUp = values[values.length - 1] >= values[0];
     const color = isUp ? DARK.green : DARK.red;
-
-    // If chart already exists with valid data, just update — no destroy
     if (portfolioChartInstance) {
       portfolioChartInstance.data.labels = labels;
       portfolioChartInstance.data.datasets[0].data = values;
       portfolioChartInstance.data.datasets[0].borderColor = color;
       portfolioChartInstance.data.datasets[0].backgroundColor = isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)';
-      portfolioChartInstance.update('none'); // 'none' = no animation on update
+      portfolioChartInstance.update('none');
       return;
     }
+    if (portfolioChartInstance) { portfolioChartInstance.destroy(); portfolioChartInstance = null; }
     portfolioChartInstance = new Chart(ctx.getContext('2d'), {
       type: 'line',
       data: { labels, datasets: [{ label: 'Portfolio Value', data: values, borderColor: color, backgroundColor: isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 0 }] },
       options: chartDefaults({ scales: { y: { grid: { color: DARK.border }, ticks: { color: DARK.muted, callback: v => '$' + fmt(v, 0) } }, x: { grid: { color: DARK.border }, ticks: { color: DARK.muted, maxTicksLimit: 6 } } } })
     });
+  }
+
+  function buildPortfolioChartFromSnapshots(snapshots) {
+    if (!snapshots || !snapshots.length) return;
+    _pendingSnapshots = snapshots;
+    const ctx = el('portfolioChart'); if (!ctx) return;
+    // If canvas is visible, render immediately
+    if (ctx.offsetWidth > 0 && ctx.offsetHeight > 0) {
+      renderPortfolioChart(snapshots);
+      return;
+    }
+    // Canvas hidden — use ResizeObserver to render when it becomes visible
+    if (window._portfolioObserver) window._portfolioObserver.disconnect();
+    window._portfolioObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          window._portfolioObserver.disconnect();
+          renderPortfolioChart(_pendingSnapshots);
+        }
+      }
+    });
+    window._portfolioObserver.observe(ctx);
   }
 
   function updatePortfolioSummaryFromServer(summary) {
@@ -670,6 +706,28 @@
       data: { labels, datasets: [{ label: 'Portfolio Value', data: values, borderColor: color, backgroundColor: isUp ? 'rgba(38,166,154,0.1)' : 'rgba(239,83,80,0.1)', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 0 }] },
       options: chartDefaults({ scales: { y: { grid: { color: DARK.border }, ticks: { color: DARK.muted, callback: v => '$' + fmt(v, 0) } }, x: { grid: { color: DARK.border }, ticks: { color: DARK.muted, maxTicksLimit: 6 } } } })
     });
+  }
+
+  function buildPortfolioChartFromSnapshots(snapshots) {
+    if (!snapshots || !snapshots.length) return;
+    _pendingSnapshots = snapshots;
+    const ctx = el('portfolioChart'); if (!ctx) return;
+    // If canvas is visible, render immediately
+    if (ctx.offsetWidth > 0 && ctx.offsetHeight > 0) {
+      renderPortfolioChart(snapshots);
+      return;
+    }
+    // Canvas hidden — use ResizeObserver to render when it becomes visible
+    if (window._portfolioObserver) window._portfolioObserver.disconnect();
+    window._portfolioObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          window._portfolioObserver.disconnect();
+          renderPortfolioChart(_pendingSnapshots);
+        }
+      }
+    });
+    window._portfolioObserver.observe(ctx);
   }
 
   window.wizDeleteHolding = function (i) {
