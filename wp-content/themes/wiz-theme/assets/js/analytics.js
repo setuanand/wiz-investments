@@ -631,27 +631,6 @@
     });
   }
 
-  function buildPortfolioChartFromSnapshots(snapshots) {
-    if (!snapshots || !snapshots.length) return;
-    _pendingSnapshots = snapshots;
-    const ctx = el('portfolioChart'); if (!ctx) return;
-    // If canvas is visible, render immediately
-    if (ctx.offsetWidth > 0 && ctx.offsetHeight > 0) {
-      renderPortfolioChart(snapshots);
-      return;
-    }
-    // Canvas hidden — use ResizeObserver to render when it becomes visible
-    if (window._portfolioObserver) window._portfolioObserver.disconnect();
-    window._portfolioObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
-          window._portfolioObserver.disconnect();
-          renderPortfolioChart(_pendingSnapshots);
-        }
-      }
-    });
-    window._portfolioObserver.observe(ctx);
-  }
 
   function updatePortfolioSummaryFromServer(summary) {
     const setEl = (id, text, cls) => { const e = el(id); if (e) { e.textContent = text; if (cls !== undefined) e.className = 'ps-value ' + cls; } };
